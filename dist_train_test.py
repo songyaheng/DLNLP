@@ -2,9 +2,9 @@ import tensorflow as tf
 import numpy as np
 
 # Flags for defining the tf.train.ClusterSpec
-tf.app.flags.DEFINE_string("ps", "10.244.1.121:8888",
+tf.app.flags.DEFINE_string("ps", "10.244.2.129:8888",
                            "Comma-separated list of hostname:port pairs")
-tf.app.flags.DEFINE_string("worker", "10.244.1.122:8888,10.244.2.128:8888",
+tf.app.flags.DEFINE_string("worker", "10.244.1.123:8888,10.244.2.130:8888",
                            "Comma-separated list of hostname:port pairs")
 
 # Flags for defining the tf.train.Server
@@ -33,8 +33,8 @@ def main(_):
         train_X = np.linspace(-1.0, 1.0, 100)
         train_Y = 2.0 * train_X + np.random.randn(*train_X.shape) * 0.33 + 10.0
 
-        X = tf.placeholder("float")
-        Y = tf.placeholder("float")
+        X = tf.placeholder()
+        Y = tf.placeholder()
 
         # Assigns ops to the local worker by default.
         with tf.device(tf.train.replica_device_setter(
