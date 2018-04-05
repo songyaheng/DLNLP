@@ -33,8 +33,8 @@ def main(_):
         train_X = np.linspace(-1.0, 1.0, 100)
         train_Y = 2.0 * train_X + np.random.randn(*train_X.shape) * 0.33 + 10.0
 
-        X = tf.placeholder()
-        Y = tf.placeholder()
+        X = tf.placeholder(tf.float32)
+        Y = tf.placeholder(tf.float32)
 
         # Assigns ops to the local worker by default.
         with tf.device(tf.train.replica_device_setter(
