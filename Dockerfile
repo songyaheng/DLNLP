@@ -4,7 +4,7 @@ FROM centos:7.2.1511
 MAINTAINER yahengsong <yahengsong@foxmail.com>
 
 # 安装python 和 pip
-RUN apt update \
+RUN yum update \
         && yum install -y python3-pip python3-dev vim \
         && pip3 install --upgrade pip \
         && pip3 install tensorflow==1.7.0 \
