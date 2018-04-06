@@ -22,7 +22,6 @@ RUN yum install -y wget \
     && yum install -y readline-devel \
     && yum install -y tk-devel \
     && yum install -y gdbm-devel \
-    && yum install -y db4-devel \
     && yum install -y libpcap-devel \
     && yum install -y xz-devel \
     && yum clean all
