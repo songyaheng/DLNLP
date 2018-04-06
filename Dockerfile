@@ -37,12 +37,10 @@ RUN wget https://www.python.org/ftp/python/3.6.0/Python-3.6.0.tar.xz \
     && ./configure --prefix=/usr/local/python3 \
     && make \
     && make install \
-    && rm -rf /usr/bin/python \
     && ln -s /usr/local/python3/bin/python3 /usr/bin/python3 \
-    && rm -rf /usr/bin/pip \
-    && ln -s /usr/local/python3/bin/pip3 /usr/bin/pip
+    && ln -s /usr/local/python3/bin/pip3 /usr/bin/pip3
 
-RUN pip install --upgrade pip \
-    && pip install https://storage.googleapis.com/tensorflow/linux/cpu/tensorflow-1.7.0-cp36-cp36m-linux_x86_64.whl
+RUN pip3 install --upgrade pip3 \
+    && pip3 install https://storage.googleapis.com/tensorflow/linux/cpu/tensorflow-1.7.0-cp36-cp36m-linux_x86_64.whl
 # 映射端口
 EXPOSE 8888
