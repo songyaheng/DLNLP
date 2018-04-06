@@ -26,7 +26,7 @@ RUN yum install -y wget \
     && yum install -y xz-devel \
     && yum clean all
 RUN wget https://www.python.org/ftp/python/3.6.0/Python-3.6.0.tar.xz \
-    && tar -xzvf Python-3.6.0.tgz \
+    && tar -xzvf Python-3.6.0.tar.xz \
     && cd Python-3.6.0 \
     && ./configure --prefix=/usr/local/python3 \
     && make \
