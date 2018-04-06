@@ -13,6 +13,11 @@ RUN yum install -y wget \
     && yum install -y zip \
     && yum install -y vim \
     && yum install -y gcc \
+    && yum install -y gcc-c++ \
+    && yum install -y automake \
+    && yum install -y autoconf \
+    && yum install -y libtool \
+    && yum install -y make \
     && yum install -y openssl-static \
     && yum install -y zlib-devel \
     && yum install -y bzip2-devel \
