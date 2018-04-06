@@ -1,5 +1,5 @@
 # 构建tensorflow 环境
-FROM centos:7.2.1511
+FROM centos:7
 
 MAINTAINER yahengsong <yahengsong@foxmail.com>
 
@@ -30,6 +30,7 @@ RUN yum install -y wget \
     && yum install -y libpcap-devel \
     && yum install -y xz-devel \
     && yum clean all
+
 RUN wget https://www.python.org/ftp/python/3.6.0/Python-3.6.0.tar.xz \
     && tar -xvf Python-3.6.0.tar.xz \
     && cd Python-3.6.0 \
@@ -37,12 +38,15 @@ RUN wget https://www.python.org/ftp/python/3.6.0/Python-3.6.0.tar.xz \
     && ./configure --prefix=/usr/local/python3 \
     && make \
     && make install \
+    && rm -rf Python-3.6.0* \
     && ln -s /usr/local/python3/bin/python3 /usr/bin/python3 \
-    && ln -s /usr/local/python3/bin/pip3 /usr/bin/pip \
-    && yum clean all
+    && ln -s /usr/local/python3/bin/pip3 /usr/bin/pip
 
 RUN pip install --upgrade pip \
-    && pip install https://storage.googleapis.com/tensorflow/linux/cpu/tensorflow-1.7.0-cp36-cp36m-linux_x86_64.whl \
-    && yum clean all
-# 映射端口
+    && pip --no-cache-dir install https://storage.googleapis.com/tensorflow/linux/cpu/tensorflow-1.7.0-cp36-cp36m-linux_x86_64.whl
+
 EXPOSE 8888
+
+WORKDIR /root
+
+ENV MEMORY_LOCK false
