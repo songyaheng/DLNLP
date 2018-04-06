@@ -6,12 +6,16 @@ MAINTAINER yahengsong <yahengsong@foxmail.com>
 RUN yum update -y
 RUN yum -y install wget
 
+RUN yum -y install epel-release
+
 # 安装python 和 pip
-RUN yum install -y python3-pip \
+RUN yum -y install epel-release \
+        && yum install -y python3-pip \
         && yum install -y python3-dev \
         && yum install -y vim \
         && pip3 install --upgrade pip \
-        && pip3 install tensorflow==1.6.0 \
+        && pip3 install numpy \
+        && pip3 install tensorflow==1.7.0 \
         && ln -s /usr/bin/python3 /usr/bin/python \
         && ln -s /usr/bin/pip3 /usr/bin/pip
 
