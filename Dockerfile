@@ -5,7 +5,7 @@ MAINTAINER yahengsong <yahengsong@foxmail.com>
 
 # 安装python 和 pip
 RUN apt update \
-        && apt install -y python3-pip python3-dev vim \
+        && yum install -y python3-pip python3-dev vim \
         && pip3 install --upgrade pip \
         && pip3 install tensorflow==1.7.0 \
         && ln -s /usr/bin/python3 /usr/bin/python \
