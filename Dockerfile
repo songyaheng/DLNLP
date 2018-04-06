@@ -15,8 +15,8 @@ RUN yum -y install epel-release \
         && yum install -y python34 \
         && yum install -y python-pip \
         && pip install --upgrade pip \
-        && pip install -y numpy \
-        && pip install -y tensorflow==1.7.0 \
+        && pip install numpy \
+        && pip install tensorflow \
         && ln -s /usr/bin/pip3 /usr/bin/pip
 # 映射端口
 EXPOSE 8888
