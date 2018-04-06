@@ -30,8 +30,8 @@ RUN wget https://www.python.org/ftp/python/3.6.0/Python-3.6.0.tar.xz \
     && ./configure --prefix=/usr/local/python3 \
     && make \
     && make install \
-    && ln -s /usr/local/python3/bin/python3 /usr/bin/python
-    && ln -s /usr/local/python3/bin/pip3 /usr/bin/pip
+    && ln -s /usr/local/python3/bin/python3 /usr/bin/python \
+    && ln -s /usr/local/python3/bin/pip3 /usr/bin/pip \
     && yum clean all
 
 RUN pip install --upgrade pip \
