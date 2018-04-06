@@ -1,11 +1,13 @@
 # 构建tensorflow 环境
-FROM centos
+FROM centos:7.2.1511
 
 MAINTAINER yahengsong <yahengsong@foxmail.com>
 
 
 RUN yum update -y \
     && yum install -y wget \
+    && mv /etc/yum.repos.d/CentOS-Base.repo /etc/yum.repos.d/CentOS-Base.repo.backup \
+    && wget -o /etc/yum.repos.d/CentOS-Base.repo http://mirrors.aliyun.com/repo/Centos-7.repo \
     && yum install -y lrzsz \
     && yum install -y unzip \
     && yum install -y zip \
