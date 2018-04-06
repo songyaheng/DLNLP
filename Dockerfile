@@ -3,22 +3,28 @@ FROM centos:7.2.1511
 
 MAINTAINER yahengsong <yahengsong@foxmail.com>
 
-RUN yum update -y
-RUN yum -y install wget
+ENV PYTHON_VERSION 3.6.0
 
-RUN yum -y install epel-release
+RUN yum update -y
+RUN yum install -y wget lrzsz unzip zip vim
+
 
 # 安装python 和 pip
+RUN wget https://www.python.org/ftp/python/$PYTHON_PIP_VERSION/Python-$PYTHON_PIP_VERSION.tgz
+RUN tar -xzvf Python-$PYTHON_PIP_VERSION.tgz
+RUN yum install gcc -y
+RUN yum install zlib* -y
+RUN yum install openssl* -y
+RUN ./Python-$PYTHON_PIP_VERSION/configure --prefix=/usr/local \
+    && make\
+    && make install
 RUN yum -y install epel-release \
-        && yum install -y python3-pip \
-        && yum install -y python3-dev \
-        && yum install -y vim \
+        && yum install -y python-pip \
         && pip3 install --upgrade pip \
         && pip3 install numpy \
         && pip3 install tensorflow==1.7.0 \
         && ln -s /usr/bin/python3 /usr/bin/python \
         && ln -s /usr/bin/pip3 /usr/bin/pip
-
 # 映射端口
 EXPOSE 8888
 
