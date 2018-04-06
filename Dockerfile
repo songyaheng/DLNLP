@@ -10,16 +10,23 @@ RUN yum install -y lrzsz
 RUN yum install -y unzip
 RUN yum install -y zip
 RUN yum install -y vim
-RUN yum -y install epel-release && yum clean all
-RUN yum -y install python-pip && yum clean all
 
-RUN yum install -y python36 \
-    && yum install -y python-pip \
-    && pip3 install --upgrade pip \
-    && pip3 install -y numpy \
-    && pip3 install -y tensorflow==1.7.0 \
-    && ln -s /usr/bin/python3 /usr/bin/python \
-    && ln -s /usr/bin/pip3 /usr/bin/pip
+# 安装python 和 pip
+RUN wget https://www.python.org/ftp/python/3.6.0/Python-3.6.0.tgz
+RUN tar -xzvf Python-3.6.0.tgz
+RUN yum install -y gcc
+RUN yum install -y zlib*
+RUN yum install -y openssl*
+RUN ./Python-3.6.0/configure --prefix=/usr/local \
+    && make\
+    && make install \
+    && ln -s /usr/bin/python3 /usr/bin/python
+RUN yum -y install epel-release \
+        && yum install -y python-pip \
+        && pip3 install --upgrade pip \
+        && pip3 install -y numpy \
+        && pip3 install -y tensorflow==1.7.0 \
+        && ln -s /usr/bin/pip3 /usr/bin/pip
 # 映射端口
 EXPOSE 8888
 
