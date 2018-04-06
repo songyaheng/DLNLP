@@ -12,7 +12,7 @@ RUN yum install -y zip
 RUN yum install -y vim
 
 RUN yum -y install epel-release \
-        && yum install -y python34
+        && yum install -y python34 \
         && yum install -y python-pip \
         && pip3 install --upgrade pip \
         && pip3 install -y numpy \
