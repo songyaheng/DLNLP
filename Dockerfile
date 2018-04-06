@@ -26,8 +26,9 @@ RUN yum install -y wget \
     && yum install -y xz-devel \
     && yum clean all
 RUN wget https://www.python.org/ftp/python/3.6.0/Python-3.6.0.tar.xz \
-    && tar -xzvf Python-3.6.0.tar.xz \
+    && tar -xvf Python-3.6.0.tar.xz \
     && cd Python-3.6.0 \
+    && mkdir -p /usr/local/python3 \
     && ./configure --prefix=/usr/local/python3 \
     && make \
     && make install \
@@ -36,7 +37,7 @@ RUN wget https://www.python.org/ftp/python/3.6.0/Python-3.6.0.tar.xz \
     && yum clean all
 
 RUN pip install --upgrade pip \
-    && pip install pip install https://storage.googleapis.com/tensorflow/linux/cpu/tensorflow-1.7.0-cp36-cp36m-linux_x86_64.whl \
+    && pip install https://storage.googleapis.com/tensorflow/linux/cpu/tensorflow-1.7.0-cp36-cp36m-linux_x86_64.whl \
     && yum clean all
 # 映射端口
 EXPOSE 8888
