@@ -46,6 +46,3 @@ RUN pip install --upgrade pip \
     && pip install https://storage.googleapis.com/tensorflow/linux/cpu/tensorflow-1.7.0-cp36-cp36m-linux_x86_64.whl
 # 映射端口
 EXPOSE 8888
-
-# 添加文件
-ADD vimrc /root/.vimrc
