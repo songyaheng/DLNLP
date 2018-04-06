@@ -3,7 +3,6 @@ FROM centos
 
 MAINTAINER yahengsong <yahengsong@foxmail.com>
 
-ENV PYTHON_VERSION 3.6.0
 
 RUN yum update -y
 RUN yum install -y wget
@@ -13,12 +12,12 @@ RUN yum install -y zip
 RUN yum install -y vim
 
 # 安装python 和 pip
-RUN wget https://www.python.org/ftp/python/$PYTHON_PIP_VERSION/Python-$PYTHON_PIP_VERSION.tgz
-RUN tar -xzvf Python-$PYTHON_PIP_VERSION.tgz
+RUN wget https://www.python.org/ftp/python/3.6.0/Python-3.6.0.tgz
+RUN tar -xzvf Python-3.6.0.tgz
 RUN yum install gcc -y
 RUN yum install zlib* -y
 RUN yum install openssl* -y
-RUN ./Python-$PYTHON_PIP_VERSION/configure --prefix=/usr/local \
+RUN ./Python-3.6.0/configure --prefix=/usr/local \
     && make\
     && make install
 RUN yum -y install epel-release \
