@@ -1,5 +1,8 @@
 import tensorflow as tf
 import numpy as np
+import os
+
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
 # Flags for defining the tf.train.ClusterSpec
 tf.app.flags.DEFINE_string("ps", "10.244.2.129:8888",
