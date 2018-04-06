@@ -27,8 +27,8 @@
       <file leaf-file-name="Dockerfile" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/Dockerfile">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="241">
-              <caret line="38" column="21" lean-forward="true" selection-start-line="38" selection-start-column="21" selection-end-line="38" selection-end-column="21" />
+            <state relative-caret-position="418">
+              <caret line="46" column="6" lean-forward="true" selection-start-line="46" selection-start-column="6" selection-end-line="46" selection-end-column="6" />
               <folding />
             </state>
           </provider>
@@ -82,8 +82,8 @@
     <sorting>DEFINITION_ORDER</sorting>
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="216" />
-    <option name="y" value="88" />
+    <option name="x" value="33" />
+    <option name="y" value="23" />
     <option name="width" value="1440" />
     <option name="height" value="805" />
   </component>
@@ -367,15 +367,15 @@
       <workItem from="1522832003339" duration="1844000" />
       <workItem from="1522920342816" duration="318000" />
       <workItem from="1522922039158" duration="3641000" />
-      <workItem from="1522979241506" duration="12957000" />
+      <workItem from="1522979241506" duration="13241000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="128669000" />
+    <option name="totallyTimeSpent" value="128953000" />
   </component>
   <component name="ToolWindowManager">
-    <frame x="216" y="88" width="1440" height="805" extended-state="0" />
+    <frame x="33" y="23" width="1440" height="805" extended-state="0" />
     <editor active="true" />
     <layout>
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
@@ -793,8 +793,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/Dockerfile">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="241">
-          <caret line="38" column="21" lean-forward="true" selection-start-line="38" selection-start-column="21" selection-end-line="38" selection-end-column="21" />
+        <state relative-caret-position="418">
+          <caret line="46" column="6" lean-forward="true" selection-start-line="46" selection-start-column="6" selection-end-line="46" selection-end-column="6" />
           <folding />
         </state>
       </provider>
