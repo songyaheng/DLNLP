@@ -5,9 +5,9 @@ import os
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
 # Flags for defining the tf.train.ClusterSpec
-tf.app.flags.DEFINE_string("ps", "10.244.2.129:8888",
+tf.app.flags.DEFINE_string("ps_hosts", "10.244.2.129:8888",
                            "Comma-separated list of hostname:port pairs")
-tf.app.flags.DEFINE_string("worker", "10.244.1.123:8888,10.244.2.130:8888",
+tf.app.flags.DEFINE_string("worker_hosts", "10.244.1.123:8888,10.244.2.130:8888",
                            "Comma-separated list of hostname:port pairs")
 
 # Flags for defining the tf.train.Server
