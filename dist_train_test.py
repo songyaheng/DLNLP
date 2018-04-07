@@ -16,11 +16,16 @@ tf.app.flags.DEFINE_integer("task_index", 0, "Index of task within the job")
 
 FLAGS = tf.app.flags.FLAGS
 
+ps_hosts = FLAGS.ps_hosts.split(",")
+worker_hosts = FLAGS.worker_hosts.split(",")
+
+def create_done_queue(i):
+    """Queue used to signal death for i'th ps shard. Intended to have
+    all workers enqueue an item onto it to signal doneness."""
+    with tf.device("/job:ps/task:%d" % (i)):
+        return tf.FIFOQueue(len(worker_hosts), tf.int32, shared_name="done_queue"+str(i))
 
 def main(_):
-    ps_hosts = FLAGS.ps.split(",")
-    worker_hosts = FLAGS.worker.split(",")
-
     # Create a cluster from the parameter server and worker hosts.
     cluster = tf.train.ClusterSpec({"ps": ps_hosts, "worker": worker_hosts})
 
@@ -30,7 +35,13 @@ def main(_):
                              task_index=FLAGS.task_index)
 
     if FLAGS.job_name == "ps":
-        server.join()
+        sess = tf.Session(server.target)
+        queue = create_done_queue(FLAGS.task_index)
+        # wait until all workers are done
+        for i in range(len(worker_hosts)):
+            sess.run(queue.dequeue())
+            print("ps %d received done %d" % (FLAGS.task_index, i))
+        print("ps %d: quitting"%(FLAGS.task_index))
     elif FLAGS.job_name == "worker":
 
         train_X = np.linspace(-1.0, 1.0, 100)
