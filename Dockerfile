@@ -1,5 +1,5 @@
 # 构建tensorflow 环境
-FROM centos:7
+FROM centos:7.4.1708
 
 MAINTAINER yahengsong <yahengsong@foxmail.com>
 
@@ -45,8 +45,9 @@ RUN wget https://www.python.org/ftp/python/3.6.0/Python-3.6.0.tar.xz \
 RUN pip install --upgrade pip \
     && pip --no-cache-dir install https://storage.googleapis.com/tensorflow/linux/cpu/tensorflow-1.7.0-cp36-cp36m-linux_x86_64.whl
 
+# TensorBoard
+EXPOSE 6006
+# IPython
 EXPOSE 8888
 
 WORKDIR /root
-
-ENV MEMORY_LOCK false
