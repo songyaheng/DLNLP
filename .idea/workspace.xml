@@ -2,7 +2,6 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="3cfe173b-8d13-4e8b-ba45-4da0256f6d35" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dist_train_test.py" afterPath="$PROJECT_DIR$/dist_train_test.py" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -38,8 +37,8 @@
       <file leaf-file-name="dist_train_test.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/dist_train_test.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="230">
-              <caret line="10" column="0" lean-forward="true" selection-start-line="10" selection-start-column="0" selection-end-line="10" selection-end-column="0" />
+            <state relative-caret-position="174">
+              <caret line="46" column="45" lean-forward="true" selection-start-line="46" selection-start-column="45" selection-end-line="46" selection-end-column="45" />
               <folding>
                 <element signature="e#23#46#0" expanded="true" />
               </folding>
@@ -394,12 +393,12 @@
       <workItem from="1522920342816" duration="318000" />
       <workItem from="1522922039158" duration="3641000" />
       <workItem from="1522979241506" duration="17869000" />
-      <workItem from="1523066376630" duration="7253000" />
+      <workItem from="1523066376630" duration="7464000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="140834000" />
+    <option name="totallyTimeSpent" value="141045000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="29" y="23" width="1440" height="805" extended-state="0" />
@@ -815,8 +814,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/dist_train_test.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="230">
-          <caret line="10" column="0" lean-forward="true" selection-start-line="10" selection-start-column="0" selection-end-line="10" selection-end-column="0" />
+        <state relative-caret-position="174">
+          <caret line="46" column="45" lean-forward="true" selection-start-line="46" selection-start-column="45" selection-end-line="46" selection-end-column="45" />
           <folding>
             <element signature="e#23#46#0" expanded="true" />
           </folding>

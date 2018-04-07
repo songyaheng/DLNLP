@@ -45,7 +45,7 @@ def main(_):
 
             w = tf.Variable(0.0, name="weight")
             b = tf.Variable(0.0, name="bias")
-            loss = tf.square(Y - tf.matmul(X, w) - b)
+            loss = tf.square(Y - X * w - b)
 
             global_step = tf.Variable(0)
 
