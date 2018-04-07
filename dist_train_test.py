@@ -1,31 +1,25 @@
+#!/usr/bin/env python
+
 import tensorflow as tf
 import numpy as np
-import os
-
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
 # Flags for defining the tf.train.ClusterSpec
-tf.app.flags.DEFINE_string("ps_hosts", "10.244.2.129:8888",
+tf.app.flags.DEFINE_string("ps_hosts", "",
                            "Comma-separated list of hostname:port pairs")
-tf.app.flags.DEFINE_string("worker_hosts", "10.244.1.123:8888,10.244.2.130:8888",
+tf.app.flags.DEFINE_string("worker_hosts", "",
                            "Comma-separated list of hostname:port pairs")
 
 # Flags for defining the tf.train.Server
-tf.app.flags.DEFINE_string("job_name", "worker", "One of 'ps', 'worker'")
+tf.app.flags.DEFINE_string("job_name", "", "One of 'ps', 'worker'")
 tf.app.flags.DEFINE_integer("task_index", 0, "Index of task within the job")
 
 FLAGS = tf.app.flags.FLAGS
 
-ps_hosts = FLAGS.ps_hosts.split(",")
-worker_hosts = FLAGS.worker_hosts.split(",")
-
-def create_done_queue(i):
-    """Queue used to signal death for i'th ps shard. Intended to have
-    all workers enqueue an item onto it to signal doneness."""
-    with tf.device("/job:ps/task:%d" % (i)):
-        return tf.FIFOQueue(len(worker_hosts), tf.int32, shared_name="done_queue"+str(i))
 
 def main(_):
+    ps_hosts = FLAGS.ps_hosts.split(",")
+    worker_hosts = FLAGS.worker_hosts.split(",")
+
     # Create a cluster from the parameter server and worker hosts.
     cluster = tf.train.ClusterSpec({"ps": ps_hosts, "worker": worker_hosts})
 
@@ -41,8 +35,8 @@ def main(_):
         train_X = np.linspace(-1.0, 1.0, 100)
         train_Y = 2.0 * train_X + np.random.randn(*train_X.shape) * 0.33 + 10.0
 
-        X = tf.placeholder(tf.float32)
-        Y = tf.placeholder(tf.float32)
+        X = tf.placeholder("float")
+        Y = tf.placeholder("float")
 
         # Assigns ops to the local worker by default.
         with tf.device(tf.train.replica_device_setter(
@@ -51,7 +45,7 @@ def main(_):
 
             w = tf.Variable(0.0, name="weight")
             b = tf.Variable(0.0, name="bias")
-            loss = tf.square(Y - X * w - b)
+            loss = tf.square(Y - tf.matmul(X, w) - b)
 
             global_step = tf.Variable(0)
 
