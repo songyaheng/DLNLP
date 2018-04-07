@@ -1,8 +1,14 @@
+from __future__ import print_function
+
 import math
 
 import tensorflow as tf
 
-from tensorflow.examples.tutorials.mnist import input_data
+import collections
+
+import sys,os
+
+import numpy as np
 
 # TensorFlow集群描述信息，ps_hosts表示参数服务节点信息，worker_hosts表示worker节点信息
 tf.app.flags.DEFINE_string("ps_hosts", "", "Comma-separated list of hostname:port pairs")
@@ -17,6 +23,151 @@ tf.app.flags.DEFINE_integer("batch_size", 100, "Training batch size")
 FLAGS = tf.app.flags.FLAGS
 #图片像素大小为28*28像素
 IMAGE_PIXELS = 28
+
+class DataSet(object):
+    def __init__(self,
+                 images,
+                 labels,
+                 reshape=True):
+        """Construct a DataSet.
+        one_hot arg is used only if fake_data is true.  `dtype` can be either
+        `uint8` to leave the input as `[0, 255]`, or `float32` to rescale into
+        `[0, 1]`.
+        """
+
+        self._num_examples = images.shape[0]
+
+        # Convert shape from [num examples, rows, columns, depth]
+        # to [num examples, rows*columns] (assuming depth == 1)
+        images = images.astype(np.float32)
+        images = np.multiply(images, 1.0 / 255.0)
+        self._images = images
+        self._labels = labels
+        self._epochs_completed = 0
+        self._index_in_epoch = 0
+
+    @property
+    def images(self):
+        return self._images
+
+    @property
+    def labels(self):
+        return self._labels
+
+    @property
+    def num_examples(self):
+        return self._num_examples
+
+    @property
+    def epochs_completed(self):
+        return self._epochs_completed
+
+    def next_batch(self, batch_size, fake_data=False, shuffle=True):
+        """Return the next `batch_size` examples from this data set."""
+        start = self._index_in_epoch
+        # Shuffle for the first epoch
+        if self._epochs_completed == 0 and start == 0 and shuffle:
+            perm0 = np.arange(self._num_examples)
+            np.random.shuffle(perm0)
+            self._images = self.images[perm0]
+            self._labels = self.labels[perm0]
+        # Go to the next epoch
+        if start + batch_size > self._num_examples:
+            # Finished epoch
+            self._epochs_completed += 1
+            # Get the rest examples in this epoch
+            rest_num_examples = self._num_examples - start
+            images_rest_part = self._images[start:self._num_examples]
+            labels_rest_part = self._labels[start:self._num_examples]
+            # Shuffle the data
+            if shuffle:
+                perm = np.arange(self._num_examples)
+                np.random.shuffle(perm)
+                self._images = self.images[perm]
+                self._labels = self.labels[perm]
+                # Start next epoch
+            start = 0
+            self._index_in_epoch = batch_size - rest_num_examples
+            end = self._index_in_epoch
+            images_new_part = self._images[start:end]
+            labels_new_part = self._labels[start:end]
+            return np.concatenate((images_rest_part, images_new_part), axis=0) , \
+                   np.concatenate((labels_rest_part, labels_new_part), axis=0)
+        else:
+            self._index_in_epoch += batch_size
+            end = self._index_in_epoch
+            return self._images[start:end], self._labels[start:end]
+def dense_to_one_hot(labels_dense, num_classes):
+    """Convert class labels from scalars to one-hot vectors."""
+    num_labels = labels_dense.shape[0]
+    index_offset = np.arange(num_labels) * num_classes
+    labels_one_hot = np.zeros((num_labels, num_classes))
+    labels_one_hot.flat[index_offset + labels_dense.ravel()] = 1
+    return labels_one_hot
+
+
+def read_data_sets(train_dir,
+                   reshape=True,
+                   validation_size=2000):
+    trainfile = os.path.join(train_dir, "mnist_train.csv")
+    testfile = os.path.join(train_dir, "mnist_test.csv")
+    train_images = np.array([], dtype=np.uint8)
+    train_labels = np.array([], dtype=np.uint8)
+    test_images = np.array([], dtype=np.uint8)
+    test_labels = np.array([], dtype=np.uint8)
+
+    count = 0
+    with open(trainfile) as f:
+        for line in f.readlines():
+            count+= 1
+            line = line.strip()
+            line = line.split(",")
+            line = [int(x) for x in line]
+            one_rray = np.array(line[1:], dtype=np.uint8)
+            train_images = np.hstack((train_images, one_rray))
+            train_labels = np.hstack((train_labels, np.array(line[0], dtype=np.uint8)))
+            if count % 10000 == 0:
+                print(str(count))
+            if count == 20000:
+                break
+    train_images = train_images.reshape(20000, 28*28)
+    train_labels = train_labels.reshape(20000, 1)
+    train_labels = dense_to_one_hot(train_labels, 10)
+
+    count = 0
+    with open(testfile) as f:
+        for line in f.readlines():
+            count += 1
+            line = line.strip()
+            line = line.split(",")
+            line = [int(x) for x in line]
+            one_rray = np.array(line[1:], dtype=np.uint8)
+            test_images = np.hstack((test_images, one_rray))
+            test_labels = np.hstack((test_labels, np.array(line[0], dtype=np.uint8)))
+            if count % 10000 == 0:
+                print(str(count))
+    test_images = test_images.reshape(10000, 28*28)
+    test_labels = test_labels.reshape(10000, 1)
+    test_labels = dense_to_one_hot(test_labels, 10)
+
+    if not 0 <= validation_size <= len(train_images):
+        raise ValueError(
+            'Validation size should be between 0 and {}. Received: {}.'
+                .format(len(train_images), validation_size))
+
+    validation_images = train_images[:validation_size]
+    validation_labels = train_labels[:validation_size]
+    train_images = train_images[validation_size:]
+    train_labels = train_labels[validation_size:]
+
+    train = DataSet(train_images, train_labels, reshape=reshape)
+    validation = DataSet(validation_images, validation_labels, reshape=reshape)
+    test = DataSet(test_images, test_labels, reshape=reshape)
+
+
+    Datasets = collections.namedtuple('Datasets', ['train', 'validation', 'test'])
+    return Datasets(train=train, validation=validation, test=test)
+
 def main(_):
     #从命令行参数中读取TensorFlow集群描述信息
     ps_hosts = FLAGS.ps_hosts.split(",")
@@ -35,7 +186,7 @@ def main(_):
             hid_w = tf.Variable(tf.truncated_normal([IMAGE_PIXELS * IMAGE_PIXELS, FLAGS.hidden_units], stddev=1.0 / IMAGE_PIXELS), name="hid_w")
             hid_b = tf.Variable(tf.zeros([FLAGS.hidden_units]), name="hid_b")
             # 定义TensorFlow softmax回归层的参数变量
-            sm_w = tf.Variable(tf.truncated_normal([FLAGS.hidden_units, 10],  tddev=1.0 / math.sqrt(FLAGS.hidden_units)), name="sm_w")
+            sm_w = tf.Variable(tf.truncated_normal([FLAGS.hidden_units, 10], stddev=1.0 / math.sqrt(FLAGS.hidden_units)), name="sm_w")
             sm_b = tf.Variable(tf.zeros([10]), name="sm_b")
             #定义模型输入数据变量（x为图片像素数据，y_为手写数字分类）
             x = tf.placeholder(tf.float32, [None, IMAGE_PIXELS * IMAGE_PIXELS])
@@ -56,13 +207,13 @@ def main(_):
             #对模型定期做checkpoint，通常用于模型回复
             saver = tf.train.Saver()
             #定义收集模型统计信息的操作
-            summary_op = tf.merge_all_summaries()
+            summary_op = tf.summary.merge_all()
             #定义操作初始化所有模型变量
             init_op = tf.initialize_all_variables()
             #创建一个监管程序，用于构建模型检查点以及计算模型统计信息。
             sv = tf.train.Supervisor(is_chief=(FLAGS.task_index == 0), logdir="/tmp/train_logs", init_op=init_op, summary_op=summary_op, saver=saver, global_step=global_step, save_model_secs=600)
             #读入MNIST训练数据集
-            mnist = input_data.read_data_sets(FLAGS.data_dir, one_hot=True)
+            mnist = read_data_sets(FLAGS.data_dir)
             #创建TensorFlow session对象，用于执行TensorFlow图计算
             with sv.managed_session(server.target) as sess:
                 step = 0
