@@ -20,7 +20,7 @@ def convert(imgf, labelf, outf, n):
     o.close()
     l.close()
 
-convert("/notebooks/tmp/train-images-idx3-ubyte", "/notebooks/tmp/train-labels-idx1-ubyte",
-        "/tmp/mnist_train.csv", 60000)
-convert("/notebooks/tmp/t10k-images-idx3-ubyte", "/notebooks/tmp/t10k-labels-idx1-ubyte",
-        "/notebooks/tmp/mnist_test.csv", 10000)
+convert("/Users/songyaheng/Downloads/train-images-idx3-ubyte", "/Users/songyaheng/Downloads/train-labels-idx1-ubyte",
+        "/Users/songyaheng/Downloads/mnist_train.csv", 60000)
+convert("/Users/songyaheng/Downloads/t10k-images-idx3-ubyte", "/Users/songyaheng/Downloads/t10k-labels-idx1-ubyte",
+        "/Users/songyaheng/Downloads/mnist_test.csv", 10000)

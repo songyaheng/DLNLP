@@ -2,9 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="3cfe173b-8d13-4e8b-ba45-4da0256f6d35" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data_convert.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/mnist_dist.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/data_convert.py" afterPath="$PROJECT_DIR$/data_convert.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/mnist_dist.py" afterPath="$PROJECT_DIR$/mnist_dist.py" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -18,6 +17,7 @@
     <SUITE FILE_PATH="coverage/DLNLP$test_dist.coverage" NAME="test_dist Coverage Results" MODIFIED="1523085241285" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/DLNLP$predict_textCNN.coverage" NAME="predict_textCNN Coverage Results" MODIFIED="1523079664436" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/DLNLP$testTextCNN.coverage" NAME="testTextCNN Coverage Results" MODIFIED="1512987788151" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/test" />
+    <SUITE FILE_PATH="coverage/DLNLP$data_convert.coverage" NAME="data_convert Coverage Results" MODIFIED="1523089275324" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/DLNLP$lda.coverage" NAME="lda Coverage Results" MODIFIED="1513146061858" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/DLNLP$ItemRegression.coverage" NAME="ItemRegression Coverage Results" MODIFIED="1521793074692" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/DLNLP$DataProcessor.coverage" NAME="DataProcessor Coverage Results" MODIFIED="1522204435132" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
@@ -52,8 +52,8 @@
       <file leaf-file-name="mnist_dist.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/mnist_dist.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="285">
-              <caret line="258" column="42" lean-forward="true" selection-start-line="258" selection-start-column="42" selection-end-line="258" selection-end-column="42" />
+            <state relative-caret-position="344">
+              <caret line="142" column="47" lean-forward="true" selection-start-line="142" selection-start-column="47" selection-end-line="142" selection-end-column="47" />
               <folding>
                 <element signature="e#0#37#0" expanded="true" />
               </folding>
@@ -64,8 +64,8 @@
       <file leaf-file-name="data_convert.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/data_convert.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="309">
-              <caret line="22" column="0" lean-forward="false" selection-start-line="22" selection-start-column="0" selection-end-line="25" selection-end-column="47" />
+            <state relative-caret-position="256">
+              <caret line="21" column="0" lean-forward="true" selection-start-line="21" selection-start-column="0" selection-end-line="21" selection-end-column="0" />
               <folding />
             </state>
           </provider>
@@ -202,25 +202,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Python.test_dist">
-    <configuration name="DataHelper" type="PythonConfigurationType" factoryName="Python" temporary="true">
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/data" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <module name="DLNLP" />
-      <EXTENSION ID="PythonCoverageRunConfigurationExtension" enabled="false" sample_coverage="true" runner="coverage.py" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/data/DataHelper.py" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <option name="EMULATE_TERMINAL" value="false" />
-    </configuration>
+  <component name="RunManager" selected="Python.data_convert">
     <configuration default="true" type="Applet" factoryName="Applet">
       <option name="HTML_USED" value="false" />
       <option name="WIDTH" value="400" />
@@ -302,6 +284,24 @@
       <properties />
       <listeners />
     </configuration>
+    <configuration name="data_convert" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <module name="DLNLP" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" enabled="false" sample_coverage="true" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/data_convert.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+    </configuration>
     <configuration name="predict_textCNN" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -375,19 +375,19 @@
       <option name="EMULATE_TERMINAL" value="false" />
     </configuration>
     <list size="5">
-      <item index="0" class="java.lang.String" itemvalue="Python.DataHelper" />
-      <item index="1" class="java.lang.String" itemvalue="Python.regression" />
-      <item index="2" class="java.lang.String" itemvalue="Python.tf-k8s" />
-      <item index="3" class="java.lang.String" itemvalue="Python.predict_textCNN" />
-      <item index="4" class="java.lang.String" itemvalue="Python.test_dist" />
+      <item index="0" class="java.lang.String" itemvalue="Python.regression" />
+      <item index="1" class="java.lang.String" itemvalue="Python.tf-k8s" />
+      <item index="2" class="java.lang.String" itemvalue="Python.predict_textCNN" />
+      <item index="3" class="java.lang.String" itemvalue="Python.test_dist" />
+      <item index="4" class="java.lang.String" itemvalue="Python.data_convert" />
     </list>
     <recent_temporary>
       <list size="5">
-        <item index="0" class="java.lang.String" itemvalue="Python.test_dist" />
-        <item index="1" class="java.lang.String" itemvalue="Python.predict_textCNN" />
-        <item index="2" class="java.lang.String" itemvalue="Python.tf-k8s" />
-        <item index="3" class="java.lang.String" itemvalue="Python.regression" />
-        <item index="4" class="java.lang.String" itemvalue="Python.DataHelper" />
+        <item index="0" class="java.lang.String" itemvalue="Python.data_convert" />
+        <item index="1" class="java.lang.String" itemvalue="Python.test_dist" />
+        <item index="2" class="java.lang.String" itemvalue="Python.predict_textCNN" />
+        <item index="3" class="java.lang.String" itemvalue="Python.tf-k8s" />
+        <item index="4" class="java.lang.String" itemvalue="Python.regression" />
       </list>
     </recent_temporary>
   </component>
@@ -430,12 +430,12 @@
       <workItem from="1522920342816" duration="318000" />
       <workItem from="1522922039158" duration="3641000" />
       <workItem from="1522979241506" duration="17869000" />
-      <workItem from="1523066376630" duration="10473000" />
+      <workItem from="1523066376630" duration="11267000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="144054000" />
+    <option name="totallyTimeSpent" value="144848000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="29" y="23" width="1440" height="805" extended-state="0" />
@@ -449,7 +449,7 @@
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.329927" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.22416303" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.33042213" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Capture Tool" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
@@ -850,16 +850,16 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/data_convert.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="309">
-          <caret line="22" column="0" lean-forward="false" selection-start-line="22" selection-start-column="0" selection-end-line="25" selection-end-column="47" />
+        <state relative-caret-position="256">
+          <caret line="21" column="0" lean-forward="true" selection-start-line="21" selection-start-column="0" selection-end-line="21" selection-end-column="0" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/mnist_dist.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="285">
-          <caret line="258" column="42" lean-forward="true" selection-start-line="258" selection-start-column="42" selection-end-line="258" selection-end-column="42" />
+        <state relative-caret-position="344">
+          <caret line="142" column="47" lean-forward="true" selection-start-line="142" selection-start-column="47" selection-end-line="142" selection-end-column="47" />
           <folding>
             <element signature="e#0#37#0" expanded="true" />
           </folding>

@@ -134,32 +134,6 @@ class DataSet(object):
             end = self._index_in_epoch
             return self._images[start:end], self._labels[start:end]
 
-def convert(imgf, labelf, outf, n):
-    f = open(imgf, "rb")
-    o = open(outf, "w")
-    l = open(labelf, "rb")
-
-    f.read(16)
-    l.read(8)
-    images = []
-
-    for i in range(n):
-        image = [ord(l.read(1))]
-        for j in range(28*28):
-            image.append(ord(f.read(1)))
-        images.append(image)
-
-    for image in images:
-        o.write(",".join(str(pix) for pix in image)+"\n")
-    f.close()
-    o.close()
-    l.close()
-
-convert("/notebooks/tmp/train-images-idx3-ubyte", "/notebooks/tmp/train-labels-idx1-ubyte",
-        "/tmp/mnist_train.csv", 60000)
-convert("/notebooks/tmp/t10k-images-idx3-ubyte", "/notebooks/tmp/t10k-labels-idx1-ubyte",
-        "/notebooks/tmp/mnist_test.csv", 10000)
-
 def read_data_sets(train_dir,
                    reshape=True,
                    validation_size=2000):
