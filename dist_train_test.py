@@ -35,13 +35,7 @@ def main(_):
                              task_index=FLAGS.task_index)
 
     if FLAGS.job_name == "ps":
-        sess = tf.Session(server.target)
-        queue = create_done_queue(FLAGS.task_index)
-        # wait until all workers are done
-        for i in range(len(worker_hosts)):
-            sess.run(queue.dequeue())
-            print("ps %d received done %d" % (FLAGS.task_index, i))
-        print("ps %d: quitting"%(FLAGS.task_index))
+        server.join()
     elif FLAGS.job_name == "worker":
 
         train_X = np.linspace(-1.0, 1.0, 100)
