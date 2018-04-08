@@ -264,6 +264,8 @@ def main(_):
             print("Training ends @ %f" % time_end)
             training_time = time_end - time_begin
             print("Training elapsed time: %f s" % training_time)
+            print("acc: %g" % sess.run(accuracy, feed_dict={x: mnist.test.images, y_: mnist.test.labels}))
+            print("cross entropy = %g" % sess.run(loss, feed_dict={x: mnist.test.images, y_: mnist.test.labels}))
             sv.stop()
 if __name__ == "__main__":
     tf.app.run()
