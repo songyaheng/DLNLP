@@ -244,7 +244,8 @@ def main(_):
                 time_begin = time.time()
                 print("Training begins @ %f" % time_begin)
                 local_step = 0
-                while not sv.should_stop() and local_step < 10000:
+                step = 0
+                while not sv.should_stop() and step < 10000:
                     # 读入MNIST的训练数据，默认每批次为100个图片
                     batch_xs, batch_ys = mnist.train.next_batch(FLAGS.batch_size)
                     train_feed = {x: batch_xs, y_: batch_ys}
