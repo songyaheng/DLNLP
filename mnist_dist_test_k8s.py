@@ -6,7 +6,7 @@ import tensorflow as tf
 
 import collections
 
-import sys,os
+import sys,os, time
 
 import numpy as np
 
@@ -181,7 +181,10 @@ def main(_):
         server.join()
     elif FLAGS.job_name == "worker":
         #分配操作到指定的worker上执行，默认为该节点上的cpu0
-        with tf.device(tf.train.replica_device_setter(worker_device="/job:worker/task:%d" % FLAGS.task_index, cluster=cluster)):
+        with tf.device(tf.train.replica_device_setter(
+                worker_device="/job:worker/task:%d" % FLAGS.task_index,
+                ps_device="/job:ps/cpu:0",
+                cluster=cluster)):
             # 定义TensorFlow隐含层参数变量，为全连接神经网络隐含层
             hid_w = tf.Variable(tf.truncated_normal([IMAGE_PIXELS * IMAGE_PIXELS, FLAGS.hidden_units], stddev=1.0 / IMAGE_PIXELS), name="hid_w")
             hid_b = tf.Variable(tf.zeros([FLAGS.hidden_units]), name="hid_b")
@@ -198,7 +201,7 @@ def main(_):
             y = tf.nn.softmax(tf.nn.xw_plus_b(hid, sm_w, sm_b))
             loss = -tf.reduce_sum(y_ * tf.log(tf.clip_by_value(y, 1e-10, 1.0)))
             #定义全局步长，默认值为0
-            global_step = tf.Variable(0)
+            global_step = tf.Variable(0, name="global_step", trainable=False)
             #定义训练模型，采用Adagrad梯度下降法
             train_op = tf.train.AdagradOptimizer(0.01).minimize(loss, global_step=global_step)
             #定义模型精确度验证模型，统计模型精确度
@@ -211,23 +214,55 @@ def main(_):
             #定义操作初始化所有模型变量
             init_op = tf.initialize_all_variables()
             #创建一个监管程序，用于构建模型检查点以及计算模型统计信息。
-            sv = tf.train.Supervisor(is_chief=(FLAGS.task_index == 0), logdir="/tmp/train_logs", init_op=init_op, summary_op=summary_op, saver=saver, global_step=global_step, save_model_secs=600)
+            is_chief = (FLAGS.task_index == 0)
+            if is_chief:
+                print("Worker %d: Initializing session..." % FLAGS.task_index)
+            else:
+                print("Worker %d: Waiting for session to be initialized..." % FLAGS.task_index)
+
+            sv = tf.train.Supervisor(
+                is_chief= is_chief,
+                logdir="/tmp/train_logs",
+                init_op=init_op,
+                summary_op=summary_op,
+                saver=saver,
+                global_step=global_step,
+                save_model_secs=600)
+
+            sess_config = tf.ConfigProto(
+                allow_soft_placement=True,
+                log_device_placement=False,
+                device_filters=["/job:ps",
+                                "/job:worker/task:%d" % FLAGS.task_index])
+
             #读入MNIST训练数据集
             mnist = read_data_sets(FLAGS.data_dir)
             #创建TensorFlow session对象，用于执行TensorFlow图计算
-            with sv.managed_session(server.target) as sess:
-                step = 0
-                while not sv.should_stop() and step < 1000:
+            with sv.managed_session(server.target, config=sess_config) as sess:
+                print("Worker %d: Session initialization complete." % FLAGS.task_index)
+                # Perform training
+                time_begin = time.time()
+                print("Training begins @ %f" % time_begin)
+                local_step = 0
+                while not sv.should_stop() and local_step < 10000:
                     # 读入MNIST的训练数据，默认每批次为100个图片
                     batch_xs, batch_ys = mnist.train.next_batch(FLAGS.batch_size)
                     train_feed = {x: batch_xs, y_: batch_ys}
                     #执行分布式TensorFlow模型训练
                     _, step = sess.run([train_op, global_step], feed_dict=train_feed)
+                    local_step = local_step + 1
+                    now = time.time()
+                    print("%f: Worker %d: training step %d done (global step: %d)" %
+                        (now, FLAGS.task_index, local_step, step))
                     #每隔100步长，验证模型精度
                     if step % 100 == 0:
-                        print("Done step %d" % step)
-                        print(sess.run(accuracy, feed_dict={x: mnist.test.images, y_: mnist.test.labels}))
+                        print("acc: %g" % sess.run(accuracy, feed_dict={x: mnist.test.images, y_: mnist.test.labels}))
+                        print("cross entropy = %g" % sess.run(loss, feed_dict={x: mnist.test.images, y_: mnist.test.labels}))
             # 停止TensorFlow Session
+            time_end = time.time()
+            print("Training ends @ %f" % time_end)
+            training_time = time_end - time_begin
+            print("Training elapsed time: %f s" % training_time)
             sv.stop()
 if __name__ == "__main__":
     tf.app.run()
