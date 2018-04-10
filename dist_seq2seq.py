@@ -176,25 +176,6 @@ class NMTModel(object):
             zip(grads, trainable_variables))
         return cost_per_token, train_op
 
-# 使用给定的模型model上训练一个epoch，并返回全局步数。
-# 每训练200步便保存一个checkpoint。
-def run_epoch(session, cost_op, train_op, saver, step):
-    # 训练一个epoch。
-    # 重复训练步骤直至遍历完Dataset中所有数据。
-    while True:
-        try:
-            # 运行train_op并计算损失值。训练数据在main()函数中以Dataset方式提供。
-            cost, _ = session.run([cost_op, train_op])
-            if step % 10 == 0:
-                print("After %d steps, per token cost is %.3f" % (step, cost))
-            # 每200步保存一个checkpoint。
-            if step % 200 == 0:
-                saver.save(session, CHECKPOINT_PATH, global_step=step)
-            step += 1
-        except tf.errors.OutOfRangeError:
-            break
-    return step
-
 FLAGS = tf.app.flags.FLAGS
 MOVING_AVERAGE_DECAY = 0.99
 
@@ -215,7 +196,7 @@ def main():
         #分配操作到指定的worker上执行，默认为该节点上的cpu0
         with tf.device(tf.train.replica_device_setter(
                 worker_device="/job:worker/task:%d" % FLAGS.task_index,
-                ps_device='/job:ps',
+                ps_device='/job:ps/cpu:1',
                 cluster=cluster)):
             # 定义初始化函数。
             initializer = tf.random_uniform_initializer(-0.05, 0.05)
@@ -249,10 +230,11 @@ def main():
                 print("Worker %d: Waiting for session to be initialized..." % FLAGS.task_index)
 
             hooks=[tf.train.StopAtStepHook(last_step=100000)]
-            sess_config = tf.ConfigProto(allow_soft_placement=True,log_device_placement=True)
+            sess_config = tf.ConfigProto(allow_soft_placement=True,log_device_placement=False,
+                                         device_filters=["/job:ps", "/job:worker/task:%d" % FLAGS.task_index])
             with tf.train.MonitoredTrainingSession(master=server.target,
                                                    is_chief=is_chief,
-                                                   checkpoint_dir="/tmp/tain_log",
+                                                   checkpoint_dir="tmp/train_log",
                                                    hooks=hooks,
                                                    save_checkpoint_secs=60,
                                                    config=sess_config) as sess:
@@ -264,7 +246,12 @@ def main():
                 step = 0
                 while not sess.should_stop() and step < 100000:
                     _, step = sess.run(iterator.initializer, global_step)
-                    local_step = run_epoch(sess, cost_op, train_op, saver, local_step)
+                    cost, _ = sess.run([cost_op, train_op])
+                    # 每200步保存一个checkpoint。
+                    if step % 200 == 0:
+                        print("After local-step %d global-step %d steps, per token cost is %.3f" % (local_step, step, cost))
+                        saver.save(sess, CHECKPOINT_PATH, global_step=step)
+                    local_step += 1
                     now = time.time()
                     print("%f: Worker %d: training step %d done (global step: %d)" %
                           (now, FLAGS.task_index, local_step, step))
