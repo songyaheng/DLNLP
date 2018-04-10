@@ -39,8 +39,8 @@
       <file leaf-file-name="dist_seq2seq.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/dist_seq2seq.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="285">
-              <caret line="198" column="40" lean-forward="true" selection-start-line="198" selection-start-column="40" selection-end-line="198" selection-end-column="40" />
+            <state relative-caret-position="341">
+              <caret line="197" column="34" lean-forward="true" selection-start-line="197" selection-start-column="34" selection-end-line="197" selection-end-column="34" />
               <folding>
                 <element signature="e#0#23#0" expanded="true" />
               </folding>
@@ -102,8 +102,8 @@
     <sorting>DEFINITION_ORDER</sorting>
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="1499" />
-    <option name="y" value="24" />
+    <option name="x" value="1801" />
+    <option name="y" value="235" />
     <option name="width" value="1440" />
     <option name="height" value="800" />
   </component>
@@ -391,15 +391,15 @@
       <workItem from="1523066376630" duration="15764000" />
       <workItem from="1523156764098" duration="5481000" />
       <workItem from="1523326348379" duration="904000" />
-      <workItem from="1523330523286" duration="13353000" />
+      <workItem from="1523330523286" duration="13448000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="169083000" />
+    <option name="totallyTimeSpent" value="169178000" />
   </component>
   <component name="ToolWindowManager">
-    <frame x="1499" y="24" width="1440" height="800" extended-state="0" />
+    <frame x="1801" y="235" width="1440" height="800" extended-state="0" />
     <editor active="true" />
     <layout>
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
@@ -744,8 +744,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/dist_seq2seq.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="285">
-          <caret line="198" column="40" lean-forward="true" selection-start-line="198" selection-start-column="40" selection-end-line="198" selection-end-column="40" />
+        <state relative-caret-position="341">
+          <caret line="197" column="34" lean-forward="true" selection-start-line="197" selection-start-column="34" selection-end-line="197" selection-end-column="34" />
           <folding>
             <element signature="e#0#23#0" expanded="true" />
           </folding>

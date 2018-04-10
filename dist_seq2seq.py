@@ -190,13 +190,11 @@ def main():
     server = tf.train.Server(cluster, job_name=FLAGS.job_name, task_index=FLAGS.task_index)
     #如果是参数服务，直接启动即可
     if FLAGS.job_name == "ps":
-        with tf.device("/cpu:0"):
-            server.join()
+        server.join()
     elif FLAGS.job_name == "worker":
         #分配操作到指定的worker上执行，默认为该节点上的cpu0
         with tf.device(tf.train.replica_device_setter(
                 worker_device="/job:worker/task:%d" % FLAGS.task_index,
-                ps_device='/job:ps/cpu:1',
                 cluster=cluster)):
             # 定义初始化函数。
             initializer = tf.random_uniform_initializer(-0.05, 0.05)
