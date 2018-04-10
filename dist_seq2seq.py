@@ -196,6 +196,7 @@ def run_epoch(session, cost_op, train_op, saver, step):
     return step
 
 FLAGS = tf.app.flags.FLAGS
+MOVING_AVERAGE_DECAY = 0.99
 
 def main():
 
@@ -208,7 +209,8 @@ def main():
     server = tf.train.Server(cluster, job_name=FLAGS.job_name, task_index=FLAGS.task_index)
     #如果是参数服务，直接启动即可
     if FLAGS.job_name == "ps":
-        server.join()
+        with tf.device("/cpu:0"):
+            server.join()
     elif FLAGS.job_name == "worker":
         #分配操作到指定的worker上执行，默认为该节点上的cpu0
         with tf.device(tf.train.replica_device_setter(
@@ -233,35 +235,33 @@ def main():
 
             # 训练模型。
             saver = tf.train.Saver()
-            #定义收集模型统计信息的操作
-            summary_op = tf.summary.merge_all()
-            #创建一个监管程序，用于构建模型检查点以及计算模型统计信息。
-            #定义操作初始化所有模型变量
-            init_op = tf.initialize_all_variables()
 
             is_chief = (FLAGS.task_index == 0)
             if is_chief:
+                # 计算变量的滑动平均值。
+                variable_averages = tf.train.ExponentialMovingAverage(MOVING_AVERAGE_DECAY, global_step)
+                variables_averages_op = variable_averages.apply(tf.trainable_variables())
+                with tf.control_dependencies([variables_averages_op, train_op]):
+                    train_op = tf.no_op()
                 print("Worker %d: Initializing session..." % FLAGS.task_index)
             else:
                 print("Worker %d: Waiting for session to be initialized..." % FLAGS.task_index)
 
-            sv = tf.train.Supervisor(
-                is_chief= is_chief,
-                logdir="/tmp/train_logs",
-                init_op=init_op,
-                summary_op=summary_op,
-                saver=saver,
-                global_step=global_step,
-                save_model_secs=60)
-            #创建TensorFlow session对象，用于执行TensorFlow图计算
-            with sv.managed_session(server.target) as sess:
+            hooks=[tf.train.StopAtStepHook(last_step=100000)]
+            sess_config = tf.ConfigProto(allow_soft_placement=True,log_device_placement=False)
+            with tf.train.MonitoredTrainingSession(master=server.target,
+                                                   is_chief=is_chief,
+                                                   checkpoint_dir="/tmp/tain_log",
+                                                   hooks=hooks,
+                                                   save_checkpoint_secs=60,
+                                                   config=sess_config) as sess:
                 print("Worker %d: Session initialization complete." % FLAGS.task_index)
                 # Perform training
                 time_begin = time.time()
                 print("Training begins @ %f" % time_begin)
                 local_step = 0
                 step = 0
-                while not sv.should_stop() and step < 100000:
+                while not sess.should_stop() and step < 100000:
                     _, step = sess.run(iterator.initializer, global_step)
                     local_step = run_epoch(sess, cost_op, train_op, saver, local_step)
                     now = time.time()

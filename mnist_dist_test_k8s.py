@@ -183,7 +183,6 @@ def main(_):
         #分配操作到指定的worker上执行，默认为该节点上的cpu0
         with tf.device(tf.train.replica_device_setter(
                 worker_device="/job:worker/task:%d" % FLAGS.task_index,
-                ps_device="/job:ps/cpu:0",
                 cluster=cluster)):
             # 定义TensorFlow隐含层参数变量，为全连接神经网络隐含层
             hid_w = tf.Variable(tf.truncated_normal([IMAGE_PIXELS * IMAGE_PIXELS, FLAGS.hidden_units], stddev=1.0 / IMAGE_PIXELS), name="hid_w")
