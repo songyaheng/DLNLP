@@ -213,6 +213,8 @@ def main():
             #定义全局步长，默认值为0
             global_step = tf.Variable(0, name="global_step", trainable=False)
 
+            init_op = tf.initialize_all_variables
+
             # 训练模型。
             saver = tf.train.Saver()
 
@@ -227,15 +229,11 @@ def main():
             else:
                 print("Worker %d: Waiting for session to be initialized..." % FLAGS.task_index)
 
-            hooks=[tf.train.StopAtStepHook(last_step=100000)]
-            sess_config = tf.ConfigProto(allow_soft_placement=True,log_device_placement=False,
-                                         device_filters=["/job:ps", "/job:worker/task:%d" % FLAGS.task_index])
-            with tf.train.MonitoredTrainingSession(master=server.target,
-                                                   is_chief=is_chief,
-                                                   checkpoint_dir="tmp/train_log",
-                                                   hooks=hooks,
-                                                   save_checkpoint_secs=60,
-                                                   config=sess_config) as sess:
+            sv = tf.train.Supervisor(is_chief=(FLAGS.task_index == 0),
+                                     global_step=global_step,
+                                     init_op=init_op)
+
+            with sv.prepare_or_wait_for_session(server.target) as sess:
                 print("Worker %d: Session initialization complete." % FLAGS.task_index)
                 # Perform training
                 time_begin = time.time()
