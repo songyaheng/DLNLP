@@ -213,7 +213,6 @@ def main():
         #分配操作到指定的worker上执行，默认为该节点上的cpu0
         with tf.device(tf.train.replica_device_setter(
                 worker_device="/job:worker/task:%d" % FLAGS.task_index,
-                ps_device="/job:ps/cpu:0",
                 cluster=cluster)):
             # 定义初始化函数。
             initializer = tf.random_uniform_initializer(-0.05, 0.05)
@@ -238,7 +237,7 @@ def main():
             summary_op = tf.summary.merge_all()
             #创建一个监管程序，用于构建模型检查点以及计算模型统计信息。
             #定义操作初始化所有模型变量
-            init_op = tf.global_variables_initializer().run()
+            init_op = tf.initialize_all_variables()
 
             is_chief = (FLAGS.task_index == 0)
             if is_chief:
@@ -254,13 +253,8 @@ def main():
                 saver=saver,
                 global_step=global_step,
                 save_model_secs=60)
-            sess_config = tf.ConfigProto(
-                allow_soft_placement=True,
-                log_device_placement=False,
-                device_filters=["/job:ps",
-                                "/job:worker/task:%d" % FLAGS.task_index])
             #创建TensorFlow session对象，用于执行TensorFlow图计算
-            with sv.managed_session(server.target, config=sess_config) as sess:
+            with sv.managed_session(server.target) as sess:
                 print("Worker %d: Session initialization complete." % FLAGS.task_index)
                 # Perform training
                 time_begin = time.time()
