@@ -3,7 +3,6 @@
   <component name="ChangeListManager">
     <list default="true" id="3cfe173b-8d13-4e8b-ba45-4da0256f6d35" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dist_seq2seq.py" afterPath="$PROJECT_DIR$/dist_seq2seq.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/mnist_dist_test_k8s.py" afterPath="$PROJECT_DIR$/mnist_dist_test_k8s.py" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -40,8 +39,8 @@
       <file leaf-file-name="dist_seq2seq.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/dist_seq2seq.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="309">
-              <caret line="212" column="25" lean-forward="true" selection-start-line="212" selection-start-column="25" selection-end-line="212" selection-end-column="25" />
+            <state relative-caret-position="249">
+              <caret line="217" column="34" lean-forward="false" selection-start-line="217" selection-start-column="34" selection-end-line="217" selection-end-column="34" />
               <folding>
                 <element signature="e#0#23#0" expanded="true" />
               </folding>
@@ -392,12 +391,12 @@
       <workItem from="1523066376630" duration="15764000" />
       <workItem from="1523156764098" duration="5481000" />
       <workItem from="1523326348379" duration="904000" />
-      <workItem from="1523330523286" duration="9252000" />
+      <workItem from="1523330523286" duration="11947000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="164982000" />
+    <option name="totallyTimeSpent" value="167677000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="1644" y="29" width="1440" height="800" extended-state="0" />
@@ -745,8 +744,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/dist_seq2seq.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="309">
-          <caret line="212" column="25" lean-forward="true" selection-start-line="212" selection-start-column="25" selection-end-line="212" selection-end-column="25" />
+        <state relative-caret-position="249">
+          <caret line="217" column="34" lean-forward="false" selection-start-line="217" selection-start-column="34" selection-end-line="217" selection-end-column="34" />
           <folding>
             <element signature="e#0#23#0" expanded="true" />
           </folding>

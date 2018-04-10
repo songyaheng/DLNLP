@@ -215,6 +215,7 @@ def main():
         #分配操作到指定的worker上执行，默认为该节点上的cpu0
         with tf.device(tf.train.replica_device_setter(
                 worker_device="/job:worker/task:%d" % FLAGS.task_index,
+                ps_device='/job:ps',
                 cluster=cluster)):
             # 定义初始化函数。
             initializer = tf.random_uniform_initializer(-0.05, 0.05)
@@ -248,7 +249,7 @@ def main():
                 print("Worker %d: Waiting for session to be initialized..." % FLAGS.task_index)
 
             hooks=[tf.train.StopAtStepHook(last_step=100000)]
-            sess_config = tf.ConfigProto(allow_soft_placement=True,log_device_placement=False)
+            sess_config = tf.ConfigProto(allow_soft_placement=True,log_device_placement=True)
             with tf.train.MonitoredTrainingSession(master=server.target,
                                                    is_chief=is_chief,
                                                    checkpoint_dir="/tmp/tain_log",
