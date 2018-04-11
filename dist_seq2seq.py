@@ -185,7 +185,7 @@ def main(_):
             y = tf.nn.softmax(tf.nn.xw_plus_b(hid, sm_w, sm_b))
             loss = -tf.reduce_sum(y_ * tf.log(tf.clip_by_value(y, 1e-10, 1.0)))
             #定义全局步长，默认值为0
-            global_step = tf.train.get_or_create_global_step
+            global_step = tf.train.get_or_create_global_step()
             #定义训练模型，采用Adagrad梯度下降法
             train_op = tf.train.AdagradOptimizer(0.01).minimize(loss, global_step=global_step)
             #定义模型精确度验证模型，统计模型精确度
