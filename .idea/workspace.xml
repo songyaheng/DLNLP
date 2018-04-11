@@ -2,7 +2,6 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="3cfe173b-8d13-4e8b-ba45-4da0256f6d35" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dist_seq2seq.py" afterPath="$PROJECT_DIR$/dist_seq2seq.py" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -30,8 +29,8 @@
       <file leaf-file-name="mnist_dist_test_k8s.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/mnist_dist_test_k8s.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="5152">
-              <caret line="234" column="73" lean-forward="false" selection-start-line="233" selection-start-column="16" selection-end-line="234" selection-end-column="73" />
+            <state relative-caret-position="347">
+              <caret line="230" column="41" lean-forward="true" selection-start-line="230" selection-start-column="41" selection-end-line="230" selection-end-column="41" />
               <folding />
             </state>
           </provider>
@@ -40,8 +39,8 @@
       <file leaf-file-name="dist_seq2seq.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/dist_seq2seq.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="192">
-              <caret line="222" column="24" lean-forward="true" selection-start-line="222" selection-start-column="24" selection-end-line="222" selection-end-column="24" />
+            <state relative-caret-position="345">
+              <caret line="237" column="35" lean-forward="true" selection-start-line="237" selection-start-column="35" selection-end-line="237" selection-end-column="35" />
               <folding>
                 <element signature="e#0#23#0" expanded="true" />
               </folding>
@@ -393,12 +392,12 @@
       <workItem from="1523156764098" duration="5481000" />
       <workItem from="1523326348379" duration="904000" />
       <workItem from="1523330523286" duration="14288000" />
-      <workItem from="1523411933214" duration="628000" />
+      <workItem from="1523411933214" duration="2471000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="170646000" />
+    <option name="totallyTimeSpent" value="172489000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="1849" y="23" width="1440" height="800" extended-state="0" />
@@ -734,16 +733,16 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/mnist_dist_test_k8s.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="5152">
-          <caret line="234" column="73" lean-forward="false" selection-start-line="233" selection-start-column="16" selection-end-line="234" selection-end-column="73" />
+        <state relative-caret-position="347">
+          <caret line="230" column="41" lean-forward="true" selection-start-line="230" selection-start-column="41" selection-end-line="230" selection-end-column="41" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/dist_seq2seq.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="192">
-          <caret line="222" column="24" lean-forward="true" selection-start-line="222" selection-start-column="24" selection-end-line="222" selection-end-column="24" />
+        <state relative-caret-position="345">
+          <caret line="237" column="35" lean-forward="true" selection-start-line="237" selection-start-column="35" selection-end-line="237" selection-end-column="35" />
           <folding>
             <element signature="e#0#23#0" expanded="true" />
           </folding>

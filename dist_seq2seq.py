@@ -171,9 +171,10 @@ class NMTModel(object):
         grads = tf.gradients(cost / tf.to_float(batch_size),
                              trainable_variables)
         grads, _ = tf.clip_by_global_norm(grads, MAX_GRAD_NORM)
+        global_step = tf.contrib.framework.get_or_create_global_step()
         optimizer = tf.train.GradientDescentOptimizer(learning_rate=1.0)
         train_op = optimizer.apply_gradients(
-            zip(grads, trainable_variables))
+            zip(grads, trainable_variables), global_step=global_step)
         return cost_per_token, train_op
 
 FLAGS = tf.app.flags.FLAGS
@@ -194,8 +195,7 @@ def main():
     elif FLAGS.job_name == "worker":
         #分配操作到指定的worker上执行，默认为该节点上的cpu0
         with tf.device(tf.train.replica_device_setter(
-                worker_device="/job:worker/task:%d/cpu:0" % FLAGS.task_index,
-                ps_device="/job:ps/cpu:0",
+                worker_device="/job:worker/task:%d" % FLAGS.task_index,
                 cluster=cluster)):
             # 定义初始化函数。
             initializer = tf.random_uniform_initializer(-0.05, 0.05)
@@ -213,36 +213,15 @@ def main():
                                             trg_label, trg_size)
             #定义全局步长，默认值为0
             global_step = tf.Variable(0, name="global_step", trainable=False)
-
-            init_op = tf.initialize_all_variables
-
             # 训练模型。
             saver = tf.train.Saver()
-
-            is_chief = (FLAGS.task_index == 0)
-            if is_chief:
-                # 计算变量的滑动平均值。
-                variable_averages = tf.train.ExponentialMovingAverage(MOVING_AVERAGE_DECAY, global_step)
-                variables_averages_op = variable_averages.apply(tf.trainable_variables())
-                with tf.control_dependencies([variables_averages_op, train_op]):
-                    train_op = tf.no_op()
-                print("Worker %d: Initializing session..." % FLAGS.task_index)
-            else:
-                print("Worker %d: Waiting for session to be initialized..." % FLAGS.task_index)
-
-            sv = tf.train.Supervisor(is_chief=(FLAGS.task_index == 0),
-                                     global_step=global_step,
-                                     logdir="/tmp/train_log",
-                                     recovery_wait_secs=1,
-                                     init_op=init_op)
-            sess_config = tf.ConfigProto(allow_soft_placement=True,
-                                        log_device_placement=False,
-                                        device_filters=["/job:ps",
-                                        "/job:worker/task:%d" % FLAGS.task_index])
-            server_grpc_url = "grpc://" + worker_hosts[FLAGS.task_index]
-            print("Using existing server at: %s" % server_grpc_url)
-
-            with sv.prepare_or_wait_for_session(server_grpc_url, config=sess_config) as sess:
+            hooks=[tf.train.StopAtStepHook(last_step=100000)]
+            # 通过tf.train.MonitoredTrainingSession管理训练深度学习模型的通用功能。
+        with tf.train.MonitoredTrainingSession(master=server.target,
+                                               is_chief=(FLAGS.task_index == 0),
+                                               checkpoint_dir="/tmp/train_logs",
+                                               hooks=hooks,
+                                               save_checkpoint_secs=10) as sess:
                 print("Worker %d: Session initialization complete." % FLAGS.task_index)
                 # Perform training
                 time_begin = time.time()
