@@ -152,7 +152,7 @@ def read_data_sets(train_dir,
     Datasets = collections.namedtuple('Datasets', ['train', 'validation', 'test'])
     return Datasets(train=train, validation=validation, test=test)
 
-def main():
+def main(_):
     #从命令行参数中读取TensorFlow集群描述信息
     ps_hosts = FLAGS.ps_hosts.split(",")
     worker_hosts = FLAGS.worker_hosts.split(",")
