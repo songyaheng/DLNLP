@@ -1,187 +1,158 @@
+import argparse
+import sys,os
 import tensorflow as tf
 import time
+import numpy as np
+import collections
 
-# TensorFlow集群描述信息，ps_hosts表示参数服务节点信息，worker_hosts表示worker节点信息
-tf.app.flags.DEFINE_string("ps_hosts", "", "Comma-separated list of hostname:port pairs")
-tf.app.flags.DEFINE_string("worker_hosts", "", "Comma-separated list of hostname:port pairs")
+FLAGS = None
+#图片像素大小为28*28像素
+IMAGE_PIXELS = 28
+class DataSet(object):
+    def __init__(self,
+                 images,
+                 labels,
+                 reshape=True):
+        """Construct a DataSet.
+        one_hot arg is used only if fake_data is true.  `dtype` can be either
+        `uint8` to leave the input as `[0, 255]`, or `float32` to rescale into
+        `[0, 1]`.
+        """
 
-# TensorFlow Server模型描述信息，包括作业名称，任务编号，隐含层神经元数量，MNIST数据目录以及每次训练数据大小（默认一个批次为100个图片）
-tf.app.flags.DEFINE_string("job_name", "", "One of 'ps', 'worker'")
-tf.app.flags.DEFINE_integer("task_index", 0, "Index of task within the job")
+        self._num_examples = images.shape[0]
 
-# 假设输入数据已经用9.2.1小节中的方法转换成了单词编号的格式。
-SRC_TRAIN_DATA = "./train.src"        # 源语言输入文件。
-TRG_TRAIN_DATA = "./train.answer"        # 目标语言输入文件。
-CHECKPOINT_PATH = "./seq2seq_ckpt"   # checkpoint保存路径。
+        # Convert shape from [num examples, rows, columns, depth]
+        # to [num examples, rows*columns] (assuming depth == 1)
+        images = images.astype(np.float32)
+        images = np.multiply(images, 1.0 / 255.0)
+        self._images = images
+        self._labels = labels
+        self._epochs_completed = 0
+        self._index_in_epoch = 0
 
-HIDDEN_SIZE = 1024                   # LSTM的隐藏层规模。
-NUM_LAYERS = 2                       # 深层循环神经网络中LSTM结构的层数。
-SRC_VOCAB_SIZE = 10000               # 源语言词汇表大小。
-TRG_VOCAB_SIZE = 4000                # 目标语言词汇表大小。
-BATCH_SIZE = 100                     # 训练数据batch的大小。
-NUM_EPOCH = 5                        # 使用训练数据的轮数。
-KEEP_PROB = 0.8                      # 节点不被dropout的概率。
-MAX_GRAD_NORM = 5                    # 用于控制梯度膨胀的梯度大小上限。
-SHARE_EMB_AND_SOFTMAX = True         # 在Softmax层和词向量层之间共享参数。
+    @property
+    def images(self):
+        return self._images
 
-MAX_LEN = 50   # 限定句子的最大单词数量。
-SOS_ID  = 1    # 目标语言词汇表中<sos>的ID。
+    @property
+    def labels(self):
+        return self._labels
 
-# 使用Dataset从一个文件中读取一个语言的数据。
-# 数据的格式为每行一句话，单词已经转化为单词编号。
-def MakeDataset(file_path):
-    dataset = tf.data.TextLineDataset(file_path)
-    # 根据空格将单词编号切分开并放入一个一维向量。
-    dataset = dataset.map(lambda string: tf.string_split([string]).values)
-    # 将字符串形式的单词编号转化为整数。
-    dataset = dataset.map(
-        lambda string: tf.string_to_number(string, tf.int32))
-    # 统计每个句子的单词数量，并与句子内容一起放入Dataset中。
-    dataset = dataset.map(lambda x: (x, tf.size(x)))
-    return dataset
+    @property
+    def num_examples(self):
+        return self._num_examples
 
-# 从源语言文件src_path和目标语言文件trg_path中分别读取数据，并进行填充和
-# batching操作。
-def MakeSrcTrgDataset(src_path, trg_path, batch_size):
-    # 首先分别读取源语言数据和目标语言数据。
-    src_data = MakeDataset(src_path)
-    trg_data = MakeDataset(trg_path)
-    # 通过zip操作将两个Dataset合并为一个Dataset。现在每个Dataset中每一项数据ds
-    # 由4个张量组成：
-    #   ds[0][0]是源句子
-    #   ds[0][1]是源句子长度
-    #   ds[1][0]是目标句子
-    #   ds[1][1]是目标句子长度
-    dataset = tf.data.Dataset.zip((src_data, trg_data))
+    @property
+    def epochs_completed(self):
+        return self._epochs_completed
 
-    # 删除内容为空（只包含<EOS>）的句子和长度过长的句子。
-    def FilterLength(src_tuple, trg_tuple):
-        ((src_input, src_len), (trg_label, trg_len)) = (src_tuple, trg_tuple)
-        src_len_ok = tf.logical_and(
-            tf.greater(src_len, 1), tf.less_equal(src_len, MAX_LEN))
-        trg_len_ok = tf.logical_and(
-            tf.greater(trg_len, 1), tf.less_equal(trg_len, MAX_LEN))
-        return tf.logical_and(src_len_ok, trg_len_ok)
-    dataset = dataset.filter(FilterLength)
-
-    # 从图9-5可知，解码器需要两种格式的目标句子：
-    #   1.解码器的输入(trg_input)，形式如同"<sos> X Y Z"
-    #   2.解码器的目标输出(trg_label)，形式如同"X Y Z <eos>"
-    # 上面从文件中读到的目标句子是"X Y Z <eos>"的形式，我们需要从中生成"<sos> X Y Z"
-    # 形式并加入到Dataset中。
-    def MakeTrgInput(src_tuple, trg_tuple):
-        ((src_input, src_len), (trg_label, trg_len)) = (src_tuple, trg_tuple)
-        trg_input = tf.concat([[SOS_ID], trg_label[:-1]], axis=0)
-        return ((src_input, src_len), (trg_input, trg_label, trg_len))
-    dataset = dataset.map(MakeTrgInput)
-
-    # 随机打乱训练数据。
-    dataset = dataset.shuffle(10000)
-
-    # 规定填充后输出的数据维度。
-    padded_shapes = (
-        (tf.TensorShape([None]),      # 源句子是长度未知的向量
-         tf.TensorShape([])),         # 源句子长度是单个数字
-        (tf.TensorShape([None]),      # 目标句子（解码器输入）是长度未知的向量
-         tf.TensorShape([None]),      # 目标句子（解码器目标输出）是长度未知的向量
-         tf.TensorShape([])))         # 目标句子长度是单个数字
-    # 调用padded_batch方法进行batching操作。
-    batched_dataset = dataset.padded_batch(batch_size, padded_shapes)
-    return batched_dataset
-
-# 定义NMTModel类来描述模型。
-class NMTModel(object):
-    # 在模型的初始化函数中定义模型要用到的变量。
-    def __init__(self):
-        # 定义编码器和解码器所使用的LSTM结构。
-        self.enc_cell = tf.nn.rnn_cell.MultiRNNCell(
-            [tf.nn.rnn_cell.BasicLSTMCell(HIDDEN_SIZE)
-             for _ in range(NUM_LAYERS)])
-        self.dec_cell = tf.nn.rnn_cell.MultiRNNCell(
-            [tf.nn.rnn_cell.BasicLSTMCell(HIDDEN_SIZE)
-             for _ in range(NUM_LAYERS)])
-
-        # 为源语言和目标语言分别定义词向量。
-        self.src_embedding = tf.get_variable(
-            "src_emb", [SRC_VOCAB_SIZE, HIDDEN_SIZE])
-        self.trg_embedding = tf.get_variable(
-            "trg_emb", [TRG_VOCAB_SIZE, HIDDEN_SIZE])
-
-        # 定义softmax层的变量
-        if SHARE_EMB_AND_SOFTMAX:
-            self.softmax_weight = tf.transpose(self.trg_embedding)
+    def next_batch(self, batch_size, fake_data=False, shuffle=True):
+        """Return the next `batch_size` examples from this data set."""
+        start = self._index_in_epoch
+        # Shuffle for the first epoch
+        if self._epochs_completed == 0 and start == 0 and shuffle:
+            perm0 = np.arange(self._num_examples)
+            np.random.shuffle(perm0)
+            self._images = self.images[perm0]
+            self._labels = self.labels[perm0]
+        # Go to the next epoch
+        if start + batch_size > self._num_examples:
+            # Finished epoch
+            self._epochs_completed += 1
+            # Get the rest examples in this epoch
+            rest_num_examples = self._num_examples - start
+            images_rest_part = self._images[start:self._num_examples]
+            labels_rest_part = self._labels[start:self._num_examples]
+            # Shuffle the data
+            if shuffle:
+                perm = np.arange(self._num_examples)
+                np.random.shuffle(perm)
+                self._images = self.images[perm]
+                self._labels = self.labels[perm]
+                # Start next epoch
+            start = 0
+            self._index_in_epoch = batch_size - rest_num_examples
+            end = self._index_in_epoch
+            images_new_part = self._images[start:end]
+            labels_new_part = self._labels[start:end]
+            return np.concatenate((images_rest_part, images_new_part), axis=0) , \
+                   np.concatenate((labels_rest_part, labels_new_part), axis=0)
         else:
-            self.softmax_weight = tf.get_variable(
-                "weight", [HIDDEN_SIZE, TRG_VOCAB_SIZE])
-        self.softmax_bias = tf.get_variable(
-            "softmax_bias", [TRG_VOCAB_SIZE])
+            self._index_in_epoch += batch_size
+            end = self._index_in_epoch
+            return self._images[start:end], self._labels[start:end]
+def dense_to_one_hot(labels_dense, num_classes):
+    """Convert class labels from scalars to one-hot vectors."""
+    num_labels = labels_dense.shape[0]
+    index_offset = np.arange(num_labels) * num_classes
+    labels_one_hot = np.zeros((num_labels, num_classes))
+    labels_one_hot.flat[index_offset + labels_dense.ravel()] = 1
+    return labels_one_hot
 
-    # 在forward函数中定义模型的前向计算图。
-    # src_input, src_size, trg_input, trg_label, trg_size分别是上面
-    # MakeSrcTrgDataset函数产生的五种张量。
-    def forward(self, src_input, src_size, trg_input, trg_label, trg_size):
-        batch_size = tf.shape(src_input)[0]
 
-        # 将输入和输出单词编号转为词向量。
-        src_emb = tf.nn.embedding_lookup(self.src_embedding, src_input)
-        trg_emb = tf.nn.embedding_lookup(self.trg_embedding, trg_input)
+def read_data_sets(train_dir,
+                   reshape=True,
+                   validation_size=2000):
+    trainfile = os.path.join(train_dir, "mnist_train.csv")
+    testfile = os.path.join(train_dir, "mnist_test.csv")
+    train_images = np.array([], dtype=np.uint8)
+    train_labels = np.array([], dtype=np.uint8)
+    test_images = np.array([], dtype=np.uint8)
+    test_labels = np.array([], dtype=np.uint8)
 
-        # 在词向量上进行dropout。
-        src_emb = tf.nn.dropout(src_emb, KEEP_PROB)
-        trg_emb = tf.nn.dropout(trg_emb, KEEP_PROB)
+    count = 0
+    with open(trainfile) as f:
+        for line in f.readlines():
+            count+= 1
+            line = line.strip()
+            line = line.split(",")
+            line = [int(x) for x in line]
+            one_rray = np.array(line[1:], dtype=np.uint8)
+            train_images = np.hstack((train_images, one_rray))
+            train_labels = np.hstack((train_labels, np.array(line[0], dtype=np.uint8)))
+            if count % 10000 == 0:
+                print(str(count))
+            if count == 20000:
+                break
+    train_images = train_images.reshape(20000, 28*28)
+    train_labels = train_labels.reshape(20000, 1)
+    train_labels = dense_to_one_hot(train_labels, 10)
 
-        # 使用dynamic_rnn构造编码器。
-        # 编码器读取源句子每个位置的词向量，输出最后一步的隐藏状态enc_state。
-        # 因为编码器是一个双层LSTM，因此enc_state是一个包含两个LSTMStateTuple类
-        # 张量的tuple，每个LSTMStateTuple对应编码器中的一层。
-        # enc_outputs是顶层LSTM在每一步的输出，它的维度是[batch_size,
-        # max_time, HIDDEN_SIZE]。Seq2Seq模型中不需要用到enc_outputs，而
-        # 后面介绍的attention模型会用到它。
-        with tf.variable_scope("encoder"):
-            enc_outputs, enc_state = tf.nn.dynamic_rnn(
-                self.enc_cell, src_emb, src_size, dtype=tf.float32)
+    count = 0
+    with open(testfile) as f:
+        for line in f.readlines():
+            count += 1
+            line = line.strip()
+            line = line.split(",")
+            line = [int(x) for x in line]
+            one_rray = np.array(line[1:], dtype=np.uint8)
+            test_images = np.hstack((test_images, one_rray))
+            test_labels = np.hstack((test_labels, np.array(line[0], dtype=np.uint8)))
+            if count % 10000 == 0:
+                print(str(count))
+    test_images = test_images.reshape(10000, 28*28)
+    test_labels = test_labels.reshape(10000, 1)
+    test_labels = dense_to_one_hot(test_labels, 10)
 
-        # 使用dyanmic_rnn构造解码器。
-        # 解码器读取目标句子每个位置的词向量，输出的dec_outputs为每一步
-        # 顶层LSTM的输出。dec_outputs的维度是 [batch_size, max_time,
-        # HIDDEN_SIZE]。
-        # initial_state=enc_state表示用编码器的输出来初始化第一步的隐藏状态。
-        with tf.variable_scope("decoder"):
-            dec_outputs, _ = tf.nn.dynamic_rnn(
-                self.dec_cell, trg_emb, trg_size, initial_state=enc_state)
+    if not 0 <= validation_size <= len(train_images):
+        raise ValueError(
+            'Validation size should be between 0 and {}. Received: {}.'
+                .format(len(train_images), validation_size))
 
-        # 计算解码器每一步的log perplexity。这一步与语言模型代码相同。
-        output = tf.reshape(dec_outputs, [-1, HIDDEN_SIZE])
-        logits = tf.matmul(output, self.softmax_weight) + self.softmax_bias
-        loss = tf.nn.sparse_softmax_cross_entropy_with_logits(
-            labels=tf.reshape(trg_label, [-1]), logits=logits)
+    validation_images = train_images[:validation_size]
+    validation_labels = train_labels[:validation_size]
+    train_images = train_images[validation_size:]
+    train_labels = train_labels[validation_size:]
 
-        # 在计算平均损失时，需要将填充位置的权重设置为0，以避免无效位置的预测干扰
-        # 模型的训练。
-        label_weights = tf.sequence_mask(
-            trg_size, maxlen=tf.shape(trg_label)[1], dtype=tf.float32)
-        label_weights = tf.reshape(label_weights, [-1])
-        cost = tf.reduce_sum(loss * label_weights)
-        cost_per_token = cost / tf.reduce_sum(label_weights)
+    train = DataSet(train_images, train_labels, reshape=reshape)
+    validation = DataSet(validation_images, validation_labels, reshape=reshape)
+    test = DataSet(test_images, test_labels, reshape=reshape)
 
-        # 定义反向传播操作。反向操作的实现与语言模型代码相同。
-        trainable_variables = tf.trainable_variables()
 
-        # 控制梯度大小，定义优化方法和训练步骤。
-        grads = tf.gradients(cost / tf.to_float(batch_size),
-                             trainable_variables)
-        grads, _ = tf.clip_by_global_norm(grads, MAX_GRAD_NORM)
-        global_step = tf.contrib.framework.get_or_create_global_step()
-        optimizer = tf.train.GradientDescentOptimizer(learning_rate=1.0)
-        train_op = optimizer.apply_gradients(
-            zip(grads, trainable_variables), global_step=global_step)
-        return cost_per_token, train_op
-
-FLAGS = tf.app.flags.FLAGS
-MOVING_AVERAGE_DECAY = 0.99
+    Datasets = collections.namedtuple('Datasets', ['train', 'validation', 'test'])
+    return Datasets(train=train, validation=validation, test=test)
 
 def main():
-
     #从命令行参数中读取TensorFlow集群描述信息
     ps_hosts = FLAGS.ps_hosts.split(",")
     worker_hosts = FLAGS.worker_hosts.split(",")
@@ -197,48 +168,109 @@ def main():
         with tf.device(tf.train.replica_device_setter(
                 worker_device="/job:worker/task:%d" % FLAGS.task_index,
                 cluster=cluster)):
-            # 定义初始化函数。
-            initializer = tf.random_uniform_initializer(-0.05, 0.05)
-            # 定义训练用的循环神经网络模型。
-            with tf.variable_scope("nmt_model", reuse=None,
-                           initializer=initializer):
-                train_model = NMTModel()
-            # 定义输入数据。
-            data = MakeSrcTrgDataset(SRC_TRAIN_DATA, TRG_TRAIN_DATA, BATCH_SIZE)
-            iterator = data.make_initializable_iterator()
-
-            (src, src_size), (trg_input, trg_label, trg_size) = iterator.get_next()
-            # 定义前向计算图。输入数据以张量形式提供给forward函数。
-            cost_op, train_op = train_model.forward(src, src_size, trg_input,
-                                            trg_label, trg_size)
+            # 定义TensorFlow隐含层参数变量，为全连接神经网络隐含层
+            hid_w = tf.Variable(tf.truncated_normal([IMAGE_PIXELS * IMAGE_PIXELS, FLAGS.hidden_units], stddev=1.0 / IMAGE_PIXELS), name="hid_w")
+            hid_b = tf.Variable(tf.zeros([FLAGS.hidden_units]), name="hid_b")
+            # 定义TensorFlow softmax回归层的参数变量
+            sm_w = tf.Variable(tf.truncated_normal([FLAGS.hidden_units, 10], stddev=1.0 / tf.sqrt(FLAGS.hidden_units)), name="sm_w")
+            sm_b = tf.Variable(tf.zeros([10]), name="sm_b")
+            #定义模型输入数据变量（x为图片像素数据，y_为手写数字分类）
+            x = tf.placeholder(tf.float32, [None, IMAGE_PIXELS * IMAGE_PIXELS])
+            y_ = tf.placeholder(tf.float32, [None, 10])
+            #定义隐含层及神经元计算模型
+            hid_lin = tf.nn.xw_plus_b(x, hid_w, hid_b)
+            hid = tf.nn.relu(hid_lin)
+            #定义softmax回归模型，及损失方程
+            y = tf.nn.softmax(tf.nn.xw_plus_b(hid, sm_w, sm_b))
+            loss = -tf.reduce_sum(y_ * tf.log(tf.clip_by_value(y, 1e-10, 1.0)))
             #定义全局步长，默认值为0
-            global_step = tf.Variable(0, name="global_step", trainable=False)
-            # 训练模型。
-            saver = tf.train.Saver()
-            hooks=[tf.train.StopAtStepHook(last_step=100000)]
-            # 通过tf.train.MonitoredTrainingSession管理训练深度学习模型的通用功能。
+            global_step = tf.contrib.framework.get_or_create_global_step()
+            #定义训练模型，采用Adagrad梯度下降法
+            train_op = tf.train.AdagradOptimizer(0.01).minimize(loss, global_step=global_step)
+            #定义模型精确度验证模型，统计模型精确度
+            correct_prediction = tf.equal(tf.argmax(y,1), tf.argmax(y_,1))
+            accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
+            #对模型定期做checkpoint，通常用于模型回复
+        #读入MNIST训练数据集
+        mnist = read_data_sets(FLAGS.data_dir)
+        saver = tf.train.Saver()
+        hooks=[tf.train.StopAtStepHook(last_step=FLAGS.train_step)]
+        # 通过tf.train.MonitoredTrainingSession管理训练深度学习模型的通用功能。
         with tf.train.MonitoredTrainingSession(master=server.target,
-                                               is_chief=(FLAGS.task_index == 0),
-                                               checkpoint_dir="/tmp/train_logs",
-                                               hooks=hooks,
-                                               save_checkpoint_secs=10) as sess:
-                print("Worker %d: Session initialization complete." % FLAGS.task_index)
-                # Perform training
-                time_begin = time.time()
-                print("Training begins @ %f" % time_begin)
-                local_step = 0
-                step = 0
-                while not sess.should_stop() and step < 100000:
-                    _, step = sess.run(iterator.initializer, global_step)
-                    cost, _ = sess.run([cost_op, train_op])
-                    # 每200步保存一个checkpoint。
-                    if step % 200 == 0:
-                        print("After local-step %d global-step %d steps, per token cost is %.3f" % (local_step, step, cost))
-                        saver.save(sess, CHECKPOINT_PATH, global_step=step)
-                    local_step += 1
-                    now = time.time()
-                    print("%f: Worker %d: training step %d done (global step: %d)" %
-                          (now, FLAGS.task_index, local_step, step))
-                saver.save(sess, CHECKPOINT_PATH, global_step=step)
+                                            is_chief=(FLAGS.task_index == 0),
+                                            checkpoint_dir=FLAGS.data_dir,
+                                            hooks=hooks,
+                                            save_checkpoint_secs=10) as sess:
+            print("Worker %d: Session initialization complete." % FLAGS.task_index)
+            local_step = 0
+            step = 0
+            while not sess.should_stop():
+                # 读入MNIST的训练数据，默认每批次为100个图片
+                batch_xs, batch_ys = mnist.train.next_batch(FLAGS.batch_size)
+                train_feed = {x: batch_xs, y_: batch_ys}
+                #执行分布式TensorFlow模型训练
+                _, step = sess.run([train_op, global_step], feed_dict=train_feed)
+                local_step = local_step + 1
+                now = time.time()
+                print("%f: Worker %d: training step %d done (global step: %d)" %
+                      (now, FLAGS.task_index, local_step, step))
+                #每隔100步长，验证模型精度
+                if step % 100 == 0:
+                    print("acc: %g" % sess.run(accuracy, feed_dict={x: mnist.test.images, y_: mnist.test.labels}))
+                    print("cross entropy = %g" % sess.run(loss, feed_dict={x: mnist.test.images, y_: mnist.test.labels}))
+            print("acc: %g" % sess.run(accuracy, feed_dict={x: mnist.test.images, y_: mnist.test.labels}))
+            print("cross entropy = %g" % sess.run(loss, feed_dict={x: mnist.test.images, y_: mnist.test.labels}))
+            saver.save(sess, FLAGS.data_dir, global_step=step)
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser()
+    parser.register("type", "bool", lambda v: v.lower() == "true")
+    parser.add_argument(
+        "--ps_hosts",
+        type=str,
+        default="",
+        help="Comma-separated list of hostname:port pairs"
+    )
+    parser.add_argument(
+        "--worker_hosts",
+        type=str,
+        default="",
+        help="Comma-separated list of hostname:port pairs"
+    )
+    parser.add_argument(
+        "--job_name",
+        type=str,
+        default="",
+        help="One of 'ps', 'worker'"
+    )
+    parser.add_argument(
+        "--task_index",
+        type=int,
+        default=0,
+        help="Index of task within the job"
+    )
+    parser.add_argument(
+        "--data_dir",
+        type=str,
+        default="/notebooks/tmp",
+        help="Index of task within the job"
+    )
+    parser.add_argument(
+        "--hidden_units",
+        type=int,
+        default=100,
+        help="Index of task within the job"
+    )
+    parser.add_argument(
+        "--batch_size",
+        type=int,
+        default=100,
+        help="Index of task within the job"
+    )
+    parser.add_argument(
+        "--train_step",
+        type=int,
+        default=100000,
+        help="Index of task within the job"
+    )
+    FLAGS, unparsed = parser.parse_known_args()
+    tf.app.run(main=main, argv=[sys.argv[0]] + unparsed)
