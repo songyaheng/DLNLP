@@ -194,7 +194,8 @@ def main():
     elif FLAGS.job_name == "worker":
         #分配操作到指定的worker上执行，默认为该节点上的cpu0
         with tf.device(tf.train.replica_device_setter(
-                worker_device="/job:worker/task:%d" % FLAGS.task_index,
+                worker_device="/job:worker/task:%d/cpu:0" % FLAGS.task_index,
+                ps_device="/job:ps/cpu:0",
                 cluster=cluster)):
             # 定义初始化函数。
             initializer = tf.random_uniform_initializer(-0.05, 0.05)
@@ -231,9 +232,17 @@ def main():
 
             sv = tf.train.Supervisor(is_chief=(FLAGS.task_index == 0),
                                      global_step=global_step,
+                                     logdir="/tmp/train_log",
+                                     recovery_wait_secs=1,
                                      init_op=init_op)
+            sess_config = tf.ConfigProto(allow_soft_placement=True,
+                                        log_device_placement=False,
+                                        device_filters=["/job:ps",
+                                        "/job:worker/task:%d" % FLAGS.task_index])
+            server_grpc_url = "grpc://" + worker_hosts[FLAGS.task_index]
+            print("Using existing server at: %s" % server_grpc_url)
 
-            with sv.prepare_or_wait_for_session(server.target) as sess:
+            with sv.prepare_or_wait_for_session(server_grpc_url, config=sess_config) as sess:
                 print("Worker %d: Session initialization complete." % FLAGS.task_index)
                 # Perform training
                 time_begin = time.time()
