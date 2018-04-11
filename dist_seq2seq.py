@@ -4,6 +4,7 @@ import tensorflow as tf
 import time
 import numpy as np
 import collections
+import math
 
 FLAGS = None
 #图片像素大小为28*28像素
@@ -172,7 +173,7 @@ def main(_):
             hid_w = tf.Variable(tf.truncated_normal([IMAGE_PIXELS * IMAGE_PIXELS, FLAGS.hidden_units], stddev=1.0 / IMAGE_PIXELS), name="hid_w")
             hid_b = tf.Variable(tf.zeros([FLAGS.hidden_units]), name="hid_b")
             # 定义TensorFlow softmax回归层的参数变量
-            sm_w = tf.Variable(tf.truncated_normal([FLAGS.hidden_units, 10], stddev=1.0 / tf.sqrt(FLAGS.hidden_units)), name="sm_w")
+            sm_w = tf.Variable(tf.truncated_normal([FLAGS.hidden_units, 10], stddev=1.0 / math.sqrt(FLAGS.hidden_units)), name="sm_w")
             sm_b = tf.Variable(tf.zeros([10]), name="sm_b")
             #定义模型输入数据变量（x为图片像素数据，y_为手写数字分类）
             x = tf.placeholder(tf.float32, [None, IMAGE_PIXELS * IMAGE_PIXELS])

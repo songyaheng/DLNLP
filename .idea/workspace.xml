@@ -41,8 +41,8 @@
       <file leaf-file-name="dist_seq2seq.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/dist_seq2seq.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="401">
-              <caret line="272" column="42" lean-forward="false" selection-start-line="272" selection-start-column="42" selection-end-line="272" selection-end-column="42" />
+            <state relative-caret-position="-70">
+              <caret line="175" column="119" lean-forward="false" selection-start-line="175" selection-start-column="119" selection-end-line="175" selection-end-column="119" />
               <folding>
                 <element signature="e#0#15#0" expanded="true" />
               </folding>
@@ -394,12 +394,12 @@
       <workItem from="1523156764098" duration="5481000" />
       <workItem from="1523326348379" duration="904000" />
       <workItem from="1523330523286" duration="14288000" />
-      <workItem from="1523411933214" duration="11301000" />
+      <workItem from="1523411933214" duration="11592000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="181319000" />
+    <option name="totallyTimeSpent" value="181610000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="1630" y="23" width="1440" height="787" extended-state="0" />
@@ -746,8 +746,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/dist_seq2seq.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="401">
-          <caret line="272" column="42" lean-forward="false" selection-start-line="272" selection-start-column="42" selection-end-line="272" selection-end-column="42" />
+        <state relative-caret-position="-70">
+          <caret line="175" column="119" lean-forward="false" selection-start-line="175" selection-start-column="119" selection-end-line="175" selection-end-column="119" />
           <folding>
             <element signature="e#0#15#0" expanded="true" />
           </folding>
