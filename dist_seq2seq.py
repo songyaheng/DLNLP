@@ -201,7 +201,8 @@ def main(_):
                                             is_chief=(FLAGS.task_index == 0),
                                             checkpoint_dir=FLAGS.data_dir,
                                             hooks=hooks,
-                                            save_checkpoint_secs=10) as sess:
+                                            save_checkpoint_secs=10,
+                                            config=tf.ConfigProto(allow_soft_placement=True, log_device_placement=True)) as sess:
             print("Worker %d: Session initialization complete." % FLAGS.task_index)
             local_step = 0
             step = 0
