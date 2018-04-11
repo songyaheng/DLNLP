@@ -257,7 +257,7 @@ if __name__ == "__main__":
     )
     parser.add_argument(
         "--hidden_units",
-        type=int,
+        type=float,
         default=100,
         help="Index of task within the job"
     )
