@@ -194,7 +194,7 @@ def main():
         #读入MNIST训练数据集
         mnist = read_data_sets(FLAGS.data_dir)
         saver = tf.train.Saver()
-        hooks=[tf.train.StopAtStepHook(last_step=FLAGS.train_step)]
+        hooks = [tf.train.StopAtStepHook(last_step=FLAGS.train_epoch)]
         # 通过tf.train.MonitoredTrainingSession管理训练深度学习模型的通用功能。
         with tf.train.MonitoredTrainingSession(master=server.target,
                                             is_chief=(FLAGS.task_index == 0),
@@ -267,7 +267,7 @@ if __name__ == "__main__":
         help="Index of task within the job"
     )
     parser.add_argument(
-        "--train_step",
+        "--train_epoch",
         type=int,
         default=100000,
         help="Index of task within the job"
