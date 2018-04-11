@@ -103,7 +103,7 @@ def read_data_sets(train_dir,
     count = 0
     with open(trainfile) as f:
         for line in f.readlines():
-            count+= 1
+            count += 1
             line = line.strip()
             line = line.split(",")
             line = [int(x) for x in line]
@@ -269,7 +269,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--train_epoch",
         type=int,
-        default=100000,
+        default=1000000,
         help="Index of task within the job"
     )
     FLAGS, unparsed = parser.parse_known_args()
