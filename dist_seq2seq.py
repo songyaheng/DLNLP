@@ -271,7 +271,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--train_epoch",
         type=int,
-        default=1000000,
+        default=100000,
         help="Index of task within the job"
     )
     FLAGS, unparsed = parser.parse_known_args()
