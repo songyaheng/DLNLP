@@ -112,7 +112,7 @@ class NMTModel(object):
     # 在forward函数中定义模型的前向计算图。
     # src_input, src_size, trg_input, trg_label, trg_size分别是上面
     # MakeSrcTrgDataset函数产生的五种张量。
-    def forward(self, src_input, src_size, trg_input, trg_label, trg_size):
+    def forward(self, src_input, src_size, trg_input, trg_label, trg_size, global_step):
         batch_size = tf.shape(src_input)[0]
 
         # 将输入和输出单词编号转为词向量。
@@ -164,8 +164,6 @@ class NMTModel(object):
         grads = tf.gradients(cost / tf.to_float(batch_size),
                              trainable_variables)
         grads, _ = tf.clip_by_global_norm(grads, MAX_GRAD_NORM)
-        #定义全局步长，默认值为0
-        global_step = tf.train.get_or_create_global_step()
         optimizer = tf.train.GradientDescentOptimizer(learning_rate=1.0)
         train_op = optimizer.apply_gradients(
             zip(grads, trainable_variables), global_step=global_step)
@@ -196,10 +194,11 @@ def main(_):
             data = MakeSrcTrgDataset(SRC_TRAIN_DATA, TRG_TRAIN_DATA, BATCH_SIZE)
             iterator = data.make_initializable_iterator()
             (src, src_size), (trg_input, trg_label, trg_size) = iterator.get_next()
+            #定义全局步长，默认值为0
+            global_step = tf.train.get_or_create_global_step()
             # 定义前向计算图。输入数据以张量形式提供给forward函数。
             cost_op, train_op = train_model.forward(src, src_size, trg_input,
-                                                trg_label, trg_size)
-            global_step = tf.train.get_or_create_global_step()
+                                                trg_label, trg_size, global_step)
         hooks = [tf.train.StopAtStepHook(last_step=FLAGS.train_epoch)]
         # 通过tf.train.MonitoredTrainingSession管理训练深度学习模型的通用功能。
         with tf.train.MonitoredTrainingSession(master=server.target,
