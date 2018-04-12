@@ -205,7 +205,6 @@ def main(_):
                                             config=tf.ConfigProto(allow_soft_placement=True, log_device_placement=True)) as sess:
             print("Worker %d: Session initialization complete." % FLAGS.task_index)
             local_step = 0
-            step = 0
             while not sess.should_stop():
                 # 读入MNIST的训练数据，默认每批次为100个图片
                 batch_xs, batch_ys = mnist.train.next_batch(FLAGS.batch_size)
@@ -220,9 +219,6 @@ def main(_):
                 if step % 100 == 0:
                     print("acc: %g" % sess.run(accuracy, feed_dict={x: mnist.test.images, y_: mnist.test.labels}))
                     print("cross entropy = %g" % sess.run(loss, feed_dict={x: mnist.test.images, y_: mnist.test.labels}))
-            print("acc: %g" % sess.run(accuracy, feed_dict={x: mnist.test.images, y_: mnist.test.labels}))
-            print("cross entropy = %g" % sess.run(loss, feed_dict={x: mnist.test.images, y_: mnist.test.labels}))
-            saver.save(sess, FLAGS.data_dir, global_step=step)
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.register("type", "bool", lambda v: v.lower() == "true")
