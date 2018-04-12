@@ -253,7 +253,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--data_dir",
         type=str,
-        default="/tfdata",
+        default="/tfdata/tmp",
         help="Index of task within the job"
     )
     parser.add_argument(
