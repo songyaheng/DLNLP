@@ -25,8 +25,9 @@ def convert(imgf, labelf, outf, n):
 # convert("/Users/songyaheng/Downloads/t10k-images-idx3-ubyte", "/Users/songyaheng/Downloads/t10k-labels-idx1-ubyte",
 #         "/Users/songyaheng/Downloads/mnist_test.csv", 10000)
 #
-f1 = open("/Users/songyaheng/Downloads/train.src", "w", encoding="utf-8")
-f2 = open("/Users/songyaheng/Downloads/train.answer", "w", encoding="utf-8")
+import collections
+from operator import itemgetter
+counter = collections.Counter()
 with open("/Users/songyaheng/Downloads/data.conv") as f:
     ff = True
     for line in f.readlines():
@@ -34,12 +35,43 @@ with open("/Users/songyaheng/Downloads/data.conv") as f:
             pass
         else:
             if ff and line.startswith("M"):
-                line = " ".join(list(line.replace("M", "").strip()))
-                f1.write(line + "\n")
+                line = list(line.replace("M", "").strip())
+                for w in line:
+                    counter[w] += 1
                 ff = False
             else:
-                line = " ".join(list(line.replace("M", "").strip()))
-                f2.write(line + "\n")
+                line = list(line.replace("M", "").strip())
+                for w in line:
+                    counter[w] += 1
+                ff = True
+sorted_word_to_cnt = sorted(
+    counter.items(), key=itemgetter(1), reverse=True)
+sorted_words = [x[0] for x in sorted_word_to_cnt]
+word = {}
+index = 0
+for w in sorted_words:
+    word[w] = index
+    index = index + 1
+
+f1 = open("/Users/songyaheng/Downloads/train.from", "w", encoding="utf-8")
+f2 = open("/Users/songyaheng/Downloads/train.to", "w", encoding="utf-8")
+with open("/Users/songyaheng/Downloads/data.conv") as f:
+    ff = True
+    for line in f.readlines():
+        if line.strip() == "E":
+            pass
+        else:
+            if ff and line.startswith("M"):
+                line = list(line.replace("M", "").strip())
+                line = map(lambda x: str(word[x]), line)
+                f1.write(" ".join(line) + "\n")
+                ff = False
+            else:
+                line = list(line.replace("M", "").strip())
+                line = map(lambda x:str(word[x]), line)
+                f2.write(" ".join(line) + "\n")
                 ff = True
 f1.close()
 f2.close()
+
+

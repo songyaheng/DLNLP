@@ -3,10 +3,9 @@ import time
 import argparse
 import sys
 
-
 # 假设输入数据已经用9.2.1小节中的方法转换成了单词编号的格式。
-SRC_TRAIN_DATA = "/tfdata/seq2seq/train.src"        # 源语言输入文件。
-TRG_TRAIN_DATA = "/tfdata/seq2seq/train.answer"        # 目标语言输入文件。
+SRC_TRAIN_DATA = "/tfdata/seq2seq/train.from"        # 源语言输入文件。
+TRG_TRAIN_DATA = "/tfdata/seq2seq/train.to"        # 目标语言输入文件。
 CHECKPOINT_PATH = "/tfdata/seq2seq"   # checkpoint保存路径。
 
 HIDDEN_SIZE = 1024                   # LSTM的隐藏层规模。
@@ -239,7 +238,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--job_name",
         type=str,
-        default="",
+        default="worker",
         help="One of 'ps', 'worker'"
     )
     parser.add_argument(
