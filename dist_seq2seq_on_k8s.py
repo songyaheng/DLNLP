@@ -249,6 +249,12 @@ if __name__ == "__main__":
         help="Index of task within the job"
     )
     parser.add_argument(
+        "--data_dir",
+        type=str,
+        default="/tfdata/seq2seq",
+        help="Index of task within the job"
+    )
+    parser.add_argument(
         "--hidden_units",
         type=float,
         default=100,
