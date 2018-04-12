@@ -26,7 +26,7 @@ def convert(imgf, labelf, outf, n):
 #         "/Users/songyaheng/Downloads/mnist_test.csv", 10000)
 #
 f1 = open("/Users/songyaheng/Downloads/train.src", "w", encoding="utf-8")
-f2 = open("/Users/songyaheng/Downloads/train.tar", "w", encoding="utf-8")
+f2 = open("/Users/songyaheng/Downloads/train.answer", "w", encoding="utf-8")
 with open("/Users/songyaheng/Downloads/data.conv") as f:
     ff = True
     for line in f.readlines():
