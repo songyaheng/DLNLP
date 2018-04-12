@@ -192,37 +192,37 @@ def main(_):
             correct_prediction = tf.equal(tf.argmax(y, 1), tf.argmax(y_, 1))
             accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
             #对模型定期做checkpoint，通常用于模型回复
-            #读入MNIST训练数据集
-            mnist = read_data_sets(FLAGS.data_dir)
-            saver = tf.train.Saver()
-            hooks = [tf.train.StopAtStepHook(last_step=FLAGS.train_epoch)]
-            # 通过tf.train.MonitoredTrainingSession管理训练深度学习模型的通用功能。
-            with tf.train.MonitoredTrainingSession(master=server.target,
+        #读入MNIST训练数据集
+        mnist = read_data_sets(FLAGS.data_dir)
+        saver = tf.train.Saver()
+        hooks = [tf.train.StopAtStepHook(last_step=FLAGS.train_epoch)]
+        # 通过tf.train.MonitoredTrainingSession管理训练深度学习模型的通用功能。
+        with tf.train.MonitoredTrainingSession(master=server.target,
                                             is_chief=(FLAGS.task_index == 0),
                                             checkpoint_dir=FLAGS.data_dir,
                                             hooks=hooks,
                                             save_checkpoint_secs=10,
                                             config=tf.ConfigProto(allow_soft_placement=True, log_device_placement=True)) as sess:
-                print("Worker %d: Session initialization complete." % FLAGS.task_index)
-                local_step = 0
-                step = 0
-                while not sess.should_stop():
-                    # 读入MNIST的训练数据，默认每批次为100个图片
-                    batch_xs, batch_ys = mnist.train.next_batch(FLAGS.batch_size)
-                    train_feed = {x: batch_xs, y_: batch_ys}
-                    #执行分布式TensorFlow模型训练
-                    _, step = sess.run([train_op, global_step], feed_dict=train_feed)
-                    local_step = local_step + 1
-                    now = time.time()
-                    print("%f: Worker %d: training step %d done (global step: %d)" %
+            print("Worker %d: Session initialization complete." % FLAGS.task_index)
+            local_step = 0
+            step = 0
+            while not sess.should_stop():
+                # 读入MNIST的训练数据，默认每批次为100个图片
+                batch_xs, batch_ys = mnist.train.next_batch(FLAGS.batch_size)
+                train_feed = {x: batch_xs, y_: batch_ys}
+                #执行分布式TensorFlow模型训练
+                _, step = sess.run([train_op, global_step], feed_dict=train_feed)
+                local_step = local_step + 1
+                now = time.time()
+                print("%f: Worker %d: training step %d done (global step: %d)" %
                         (now, FLAGS.task_index, local_step, step))
-                    #每隔100步长，验证模型精度
-                    if step % 100 == 0:
-                        print("acc: %g" % sess.run(accuracy, feed_dict={x: mnist.test.images, y_: mnist.test.labels}))
-                        print("cross entropy = %g" % sess.run(loss, feed_dict={x: mnist.test.images, y_: mnist.test.labels}))
-                print("acc: %g" % sess.run(accuracy, feed_dict={x: mnist.test.images, y_: mnist.test.labels}))
-                print("cross entropy = %g" % sess.run(loss, feed_dict={x: mnist.test.images, y_: mnist.test.labels}))
-                saver.save(sess, FLAGS.data_dir, global_step=step)
+                #每隔100步长，验证模型精度
+                if step % 100 == 0:
+                    print("acc: %g" % sess.run(accuracy, feed_dict={x: mnist.test.images, y_: mnist.test.labels}))
+                    print("cross entropy = %g" % sess.run(loss, feed_dict={x: mnist.test.images, y_: mnist.test.labels}))
+            print("acc: %g" % sess.run(accuracy, feed_dict={x: mnist.test.images, y_: mnist.test.labels}))
+            print("cross entropy = %g" % sess.run(loss, feed_dict={x: mnist.test.images, y_: mnist.test.labels}))
+            saver.save(sess, FLAGS.data_dir, global_step=step)
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.register("type", "bool", lambda v: v.lower() == "true")
