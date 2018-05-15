@@ -1,5 +1,5 @@
 # 构建tensorflow 环境
-FROM ubuntu:16.04
+FROM centos:7
 
 MAINTAINER yahengsong <yahengsong@foxmail.com>
 
