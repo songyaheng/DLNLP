@@ -1,35 +1,31 @@
 # 构建tensorflow 环境
-FROM centos:7
+FROM ubuntu
 
 MAINTAINER yahengsong <yahengsong@foxmail.com>
 
 
-RUN yum install -y wget \
-    && mv /etc/yum.repos.d/CentOS-Base.repo /etc/yum.repos.d/CentOS-Base.repo.backup \
-    && curl http://mirrors.aliyun.com/repo/Centos-7.repo -o /etc/yum.repos.d/CentOS-Base.repo \
-    && yum update -y \
-    && yum install -y lrzsz \
-    && yum install -y unzip \
-    && yum install -y zip \
-    && yum install -y vim \
-    && yum install -y gcc \
-    && yum install -y gcc-c++ \
-    && yum install -y automake \
-    && yum install -y autoconf \
-    && yum install -y libtool \
-    && yum install -y make \
-    && yum install -y openssl-static \
-    && yum install -y zlib-devel \
-    && yum install -y bzip2-devel \
-    && yum install -y openssl-devel \
-    && yum install -y ncurses-devel \
-    && yum install -y sqlite-devel \
-    && yum install -y readline-devel \
-    && yum install -y tk-devel \
-    && yum install -y gdbm-devel \
-    && yum install -y libpcap-devel \
-    && yum install -y xz-devel \
-    && yum clean all
+RUN sudo apt-get install wget \
+    && sudo apt-get install lrzsz \
+    && sudo apt-get install unzip \
+    && sudo apt-get install zip \
+    && sudo apt-get install vim \
+    && sudo apt-get install gcc \
+    && sudo apt-get install gcc-c++ \
+    && sudo apt-get install automake \
+    && sudo apt-get install autoconf \
+    && sudo apt-get install libtool \
+    && sudo apt-get install make \
+    && sudo apt-get install openssl-static \
+    && sudo apt-get install zlib-devel \
+    && sudo apt-get install bzip2-devel \
+    && sudo apt-get install openssl-devel \
+    && sudo apt-get install ncurses-devel \
+    && sudo apt-get install sqlite-devel \
+    && sudo apt-get install readline-devel \
+    && sudo apt-get install tk-devel \
+    && sudo apt-get install gdbm-devel \
+    && sudo apt-get install libpcap-devel \
+    && sudo apt-get install xz-devel
 
 RUN wget https://www.python.org/ftp/python/3.6.0/Python-3.6.0.tar.xz \
     && tar -xvf Python-3.6.0.tar.xz \
