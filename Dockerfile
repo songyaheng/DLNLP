@@ -4,28 +4,28 @@ FROM ubuntu
 MAINTAINER yahengsong <yahengsong@foxmail.com>
 
 
-RUN sudo apt-get install wget \
-    && sudo apt-get install lrzsz \
-    && sudo apt-get install unzip \
-    && sudo apt-get install zip \
-    && sudo apt-get install vim \
-    && sudo apt-get install gcc \
-    && sudo apt-get install gcc-c++ \
-    && sudo apt-get install automake \
-    && sudo apt-get install autoconf \
-    && sudo apt-get install libtool \
-    && sudo apt-get install make \
-    && sudo apt-get install openssl-static \
-    && sudo apt-get install zlib-devel \
-    && sudo apt-get install bzip2-devel \
-    && sudo apt-get install openssl-devel \
-    && sudo apt-get install ncurses-devel \
-    && sudo apt-get install sqlite-devel \
-    && sudo apt-get install readline-devel \
-    && sudo apt-get install tk-devel \
-    && sudo apt-get install gdbm-devel \
-    && sudo apt-get install libpcap-devel \
-    && sudo apt-get install xz-devel
+RUN apt-get install wget \
+    && apt-get install lrzsz \
+    && apt-get install unzip \
+    && apt-get install zip \
+    && apt-get install vim \
+    && apt-get install gcc \
+    && apt-get install gcc-c++ \
+    && apt-get install automake \
+    && apt-get install autoconf \
+    && apt-get install libtool \
+    && apt-get install make \
+    && apt-get install openssl-static \
+    && apt-get install zlib-devel \
+    && apt-get install bzip2-devel \
+    && apt-get install openssl-devel \
+    && apt-get install ncurses-devel \
+    && apt-get install sqlite-devel \
+    && apt-get install readline-devel \
+    && apt-get install tk-devel \
+    && apt-get install gdbm-devel \
+    && apt-get install libpcap-devel \
+    && apt-get install xz-devel
 
 RUN wget https://www.python.org/ftp/python/3.6.0/Python-3.6.0.tar.xz \
     && tar -xvf Python-3.6.0.tar.xz \
