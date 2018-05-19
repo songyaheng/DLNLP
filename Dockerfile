@@ -18,9 +18,10 @@ RUN apt-get update \
     && apt-get install -y make \
     && apt-get install -y openssl \
     && apt-get install -y libssl-dev \
-    && apt-get install -y zlib-devel \
+    && apt-get install -y ruby \
+    && apt-get install -y zlib1g \
+    && apt-get install zlib1g.dev \
     && apt-get install -y bzip2-devel \
-    && apt-get install -y openssl-devel \
     && apt-get install -y ncurses-devel \
     && apt-get install -y sqlite-devel \
     && apt-get install -y readline-devel \
