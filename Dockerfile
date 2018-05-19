@@ -11,7 +11,7 @@ RUN apt-get update \
     && apt-get install -y zip \
     && apt-get install -y vim \
     && apt-get install -y gcc \
-    && apt-get install -y gcc-c++ \
+    && apt-get install -y g++ \
     && apt-get install -y automake \
     && apt-get install -y autoconf \
     && apt-get install -y libtool \
