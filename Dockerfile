@@ -1,31 +1,32 @@
 # 构建tensorflow 环境
-FROM ubuntu
+FROM ubuntu:16.04
 
 MAINTAINER yahengsong <yahengsong@foxmail.com>
 
 
-RUN apt-get install wget \
-    && apt-get install lrzsz \
-    && apt-get install unzip \
-    && apt-get install zip \
-    && apt-get install vim \
-    && apt-get install gcc \
-    && apt-get install gcc-c++ \
-    && apt-get install automake \
-    && apt-get install autoconf \
-    && apt-get install libtool \
-    && apt-get install make \
-    && apt-get install openssl-static \
-    && apt-get install zlib-devel \
-    && apt-get install bzip2-devel \
-    && apt-get install openssl-devel \
-    && apt-get install ncurses-devel \
-    && apt-get install sqlite-devel \
-    && apt-get install readline-devel \
-    && apt-get install tk-devel \
-    && apt-get install gdbm-devel \
-    && apt-get install libpcap-devel \
-    && apt-get install xz-devel
+RUN apt-get update \
+    && apt-get install -y wget \
+    && apt-get install -y lrzsz \
+    && apt-get install -y unzip \
+    && apt-get install -y zip \
+    && apt-get install -y vim \
+    && apt-get install -y gcc \
+    && apt-get install -y gcc-c++ \
+    && apt-get install -y automake \
+    && apt-get install -y autoconf \
+    && apt-get install -y libtool \
+    && apt-get install -y make \
+    && apt-get install -y openssl-static \
+    && apt-get install -y zlib-devel \
+    && apt-get install -y bzip2-devel \
+    && apt-get install -y openssl-devel \
+    && apt-get install -y ncurses-devel \
+    && apt-get install -y sqlite-devel \
+    && apt-get install -y readline-devel \
+    && apt-get install -y tk-devel \
+    && apt-get install -y gdbm-devel \
+    && apt-get install -y libpcap-devel \
+    && apt-get install -y xz-devel
 
 RUN wget https://www.python.org/ftp/python/3.6.0/Python-3.6.0.tar.xz \
     && tar -xvf Python-3.6.0.tar.xz \
