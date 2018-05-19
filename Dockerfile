@@ -16,7 +16,8 @@ RUN apt-get update \
     && apt-get install -y autoconf \
     && apt-get install -y libtool \
     && apt-get install -y make \
-    && apt-get install -y openssl-static \
+    && apt-get install -y openssl \
+    && apt-get install -y libssl-dev \
     && apt-get install -y zlib-devel \
     && apt-get install -y bzip2-devel \
     && apt-get install -y openssl-devel \
