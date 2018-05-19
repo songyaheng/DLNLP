@@ -21,14 +21,12 @@ RUN apt-get update \
     && apt-get install -y ruby \
     && apt-get install -y zlib1g \
     && apt-get install zlib1g.dev \
-    && apt-get install -y bzip2-devel \
-    && apt-get install -y ncurses-devel \
-    && apt-get install -y sqlite-devel \
-    && apt-get install -y readline-devel \
-    && apt-get install -y tk-devel \
-    && apt-get install -y gdbm-devel \
-    && apt-get install -y libpcap-devel \
-    && apt-get install -y xz-devel
+    && apt-get install -y bzip2 \
+    && apt-get install -y libncurses5-dev \
+    && apt-get install -y sqlite sqlite3 \
+    && apt-get install -y readline-dev \
+    && apt-get install -y libgdbm-dev \
+    && apt-get install -y libpcap-dev
 
 RUN wget https://www.python.org/ftp/python/3.6.0/Python-3.6.0.tar.xz \
     && tar -xvf Python-3.6.0.tar.xz \
