@@ -24,7 +24,6 @@ RUN apt-get update \
     && apt-get install -y bzip2 \
     && apt-get install -y libncurses5-dev \
     && apt-get install -y sqlite sqlite3 \
-    && apt-get install -y readline-dev \
     && apt-get install -y libgdbm-dev \
     && apt-get install -y libpcap-dev
 
