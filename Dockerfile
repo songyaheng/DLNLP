@@ -25,7 +25,9 @@ RUN apt-get update \
     && apt-get install -y libncurses5-dev \
     && apt-get install -y sqlite sqlite3 \
     && apt-get install -y libgdbm-dev \
-    && apt-get install -y libpcap-dev
+    && apt-get install -y libpcap-dev \
+    && apt-get install -y xz-utils
+
 
 RUN wget https://www.python.org/ftp/python/3.6.0/Python-3.6.0.tar.xz \
     && tar -xvf Python-3.6.0.tar.xz \
